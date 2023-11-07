@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class WebSockConfig implements WebSocketConfigurer {
     private final WebSocketHandler webSocketHandler;
 
-    @Override
+	@Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(webSocketHandler, "/ws/chat").setAllowedOrigins("*");
     }
