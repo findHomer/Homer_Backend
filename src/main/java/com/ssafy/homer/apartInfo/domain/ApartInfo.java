@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -17,7 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Builder
-public class Apartment {
+public class ApartInfo {
 	/*
 	 * aptId는 고유값 존재
 	 */
