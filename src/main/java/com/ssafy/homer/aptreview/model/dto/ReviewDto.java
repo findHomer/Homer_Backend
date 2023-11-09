@@ -15,7 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReviewDto implements ReviewToDto{
+public class ReviewDto{
 	
 	//리뷰Id
 	private Long reviewId;
@@ -37,4 +37,5 @@ public class ReviewDto implements ReviewToDto{
 	
 	//등록일자
 	private Date createdAt;
+
 }

@@ -7,7 +7,7 @@ public interface ReviewToDto {
 	String getAptId();
 	Long getUserId();
 	String getContents();
-	String getphotoUrl();
+	String getPhotoUrl();
 	Float getStarScore();
 	Date getCreatedAt();
 }
