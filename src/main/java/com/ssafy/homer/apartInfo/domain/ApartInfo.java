@@ -32,7 +32,7 @@ public class ApartInfo{
 	
 	private String lawAddr;
 	
-	private String loadAddr;
+	private String roadAddr;
 	
 	private String postcode;
 	
