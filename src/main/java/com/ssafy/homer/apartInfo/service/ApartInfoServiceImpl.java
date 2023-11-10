@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.ssafy.homer.apartInfo.dto.ApartInfoMapping;
+import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
 import com.ssafy.homer.apartInfo.repository.ApartInfoRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -15,9 +15,9 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 	
 	private final ApartInfoRepository apartInfoRepository;
 	@Override
-	public List<ApartInfoMapping> getTotalApart() {
+	public List<ApartInfoDto> getTotalApart() {
 		// TODO Auto-generated method stub
-		return apartInfoRepository.findAll();
+		return apartInfoRepository.findSimpleAll();
 	}
 
 }

@@ -2,12 +2,12 @@ package com.ssafy.homer.apartInfo.service;
 
 import java.util.List;
 
-import com.ssafy.homer.apartInfo.dto.ApartInfoMapping;
+import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
 
 
 public interface ApartInfoService {
 
-	List<ApartInfoMapping> getTotalApart();
+	List<ApartInfoDto> getTotalApart();
 	
 	
 }

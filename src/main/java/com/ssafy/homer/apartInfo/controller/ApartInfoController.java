@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.homer.apartInfo.dto.ApartInfoMapping;
+import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
 import com.ssafy.homer.apartInfo.service.ApartInfoService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class ApartInfoController {
 	@GetMapping()
 	public ResponseEntity totalApart() {
 		
-		List<ApartInfoMapping> lists = apartInfoService.getTotalApart();
+		List<ApartInfoDto> lists = apartInfoService.getTotalApart();
 		return ResponseEntity.ok().body(lists);
 	}
 	
