@@ -8,8 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import com.ssafy.homer.apartInfo.domain.ApartInfo;
 import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
+import com.ssafy.homer.apartInfo.dto.SearchDto;
 @Repository
-public interface ApartInfoRepository extends JpaRepository<ApartInfo,String>{
+public interface ApartInfoRepository extends JpaRepository<ApartInfo,String>,ApartInfoRepositoryCustom{
 	
 	/**
 	 * 특정 필드만 뽑아내는 Projections 적용하기위해 JPQL 쿼리문 작성
@@ -17,4 +18,6 @@ public interface ApartInfoRepository extends JpaRepository<ApartInfo,String>{
 	 */
 	@Query("select new com.ssafy.homer.apartInfo.dto.ApartInfoDto(a.aptId,a.aptName,a.latitude,a.longitude) from apart_info a")
 	List<ApartInfoDto> findSimpleAll();
+	
+	List<ApartInfoDto> searchAll(SearchDto searchDto);
 }

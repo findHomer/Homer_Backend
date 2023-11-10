@@ -16,7 +16,6 @@ import lombok.Setter;
 @Builder
 public class ApartInfoDto {
 	
-	
 	private String aptId;
 	private String aptName;
 	private Float latitude;
