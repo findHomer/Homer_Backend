@@ -31,8 +31,7 @@ dependencies {
 
     // QueryDSL 관련 의존성
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-    implementation "com.querydsl:querydsl-core:${queryDslVersion}"
-    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jpa"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
 }
 
 // QueryDSL 소스 디렉토리 설정
@@ -48,6 +47,9 @@ sourceSets {
 }
 
 configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
     querydsl.extendsFrom compileClasspath
 }
 
