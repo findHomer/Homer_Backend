@@ -12,31 +12,27 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class ApartInfoDetailDto {
-	@Id
+
 	private String aptId;
 	
 	private String aptName;
-	
-	private String type;
+
+	private String aisleType;
 	
 	private String lawAddr;
 	
-	private String loadAddr;
+	private String roadAddr;
+
+	private String allowDate;//DATE
 	
-	private String postcode;
-	
-	private String allowDate;
-	
-	private String dongCount;
+	private Integer dongCount;
 	
 	private Integer householdCount;
-	
-	private String aisleType;
-	
+
 	private Integer maxFloor;
-	 
-	private Integer carCount;
 	
+	private Float canPark;
+
 	private Float latitude;
 	
 	private Float longitude;
