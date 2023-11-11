@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.*;
 
 @Getter
 @Setter
@@ -36,4 +37,6 @@ public class ApartInfoDetailDto {
 	private Float latitude;
 	
 	private Float longitude;
+
+	private List<ApartDealAreaDto> dealInfos;
 }

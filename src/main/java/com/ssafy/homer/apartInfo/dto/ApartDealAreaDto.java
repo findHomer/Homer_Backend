@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class ApartDealreaDto {
+public class ApartDealAreaDto {
 
     private Float exclusiveArea;
 
