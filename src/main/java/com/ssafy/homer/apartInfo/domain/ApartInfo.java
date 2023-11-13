@@ -1,9 +1,7 @@
 package com.ssafy.homer.apartInfo.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.*;
 
 
 import lombok.AllArgsConstructor;
@@ -53,7 +51,8 @@ public class ApartInfo{
 	private Float longitude;
 	
 	//아파트 거래 와 1:N
-	
+	@OneToMany(mappedBy = "apartInfo")
+	private List<ApartDeal> apartDealList;
 	//리뷰와 1:N
 	
 	//즐겨찾기와  1:N

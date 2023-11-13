@@ -4,6 +4,8 @@ import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.util.Date;
 
 @Entity(name="apart_deal")
@@ -31,5 +33,7 @@ public class ApartDeal {
 
     private Date transactionDate;
 
-
+    @ManyToOne
+    @JoinColumn(name = "apt_id")
+    private ApartInfo apartInfo;
 }
