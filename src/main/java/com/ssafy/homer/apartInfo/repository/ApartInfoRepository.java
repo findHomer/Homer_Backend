@@ -18,6 +18,11 @@ public interface ApartInfoRepository extends JpaRepository<ApartInfo,String>,Apa
 	 */
 	@Query("select new com.ssafy.homer.apartInfo.dto.ApartInfoDto(a.aptId,a.aptName,a.latitude,a.longitude) from apart_info a")
 	List<ApartInfoDto> findSimpleAll();
-	
+
+	/**
+	 * 쿼리 dsl사용하여 필터검색 구현
+	 * @param searchDto
+	 * @return
+	 */
 	List<ApartInfoDto> searchAll(SearchDto searchDto);
 }
