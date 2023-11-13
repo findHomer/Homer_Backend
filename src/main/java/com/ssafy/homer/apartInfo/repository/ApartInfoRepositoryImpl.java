@@ -19,19 +19,19 @@ public class ApartInfoRepositoryImpl implements ApartInfoRepositoryCustom{
 	private final JPAQueryFactory queryFactory;
 	
 	@Override
-	public List<ApartInfoDto> searchAll(SearchMapDto searchMapDto) {
+	public List<ApartInfoDto> searchMap(SearchMapDto searchMapDto) {
 		QApartInfo  qApartInfo = QApartInfo.apartInfo;
 		List<ApartInfoDto> result=  queryFactory
 				.select(Projections.constructor(ApartInfoDto.class,qApartInfo.aptId,qApartInfo.aptName,qApartInfo.latitude,qApartInfo.longitude ))
 				.from(qApartInfo)
-				.where(allSearch(searchMapDto)
+				.where(mapSearch(searchMapDto)
 						).fetch();
 				
 		
 		return result;
 	}
 	
-	private BooleanExpression allSearch(SearchMapDto searchMapDto) {
+	private BooleanExpression mapSearch(SearchMapDto searchMapDto) {
 		
 		return betweenLat(searchMapDto.getStartLat(), searchMapDto.getEndLat())
 				.and(betweenLng(searchMapDto.getStartLng(), searchMapDto.getEndLng()))

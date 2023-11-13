@@ -6,5 +6,5 @@ import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
 import com.ssafy.homer.apartInfo.dto.SearchMapDto;
 
 public interface ApartInfoRepositoryCustom {
-	List<ApartInfoDto> searchAll(SearchMapDto searchMapDto);
+	List<ApartInfoDto> searchMap(SearchMapDto searchMapDto);
 }
