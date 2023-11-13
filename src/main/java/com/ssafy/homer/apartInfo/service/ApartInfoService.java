@@ -5,15 +5,17 @@ import java.util.List;
 import com.ssafy.homer.apartInfo.dto.ApartInfoDetailDto;
 import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
 import com.ssafy.homer.apartInfo.dto.SearchMapDto;
+import com.ssafy.homer.apartInfo.dto.SearchNameDto;
 
 
 public interface ApartInfoService {
 
-	List<ApartInfoDto> getTotalApart();
+	List<ApartInfoDto> findTotalApart();
 
-	List<ApartInfoDto> getApartInMap(SearchMapDto searchMapDto);
+	List<ApartInfoDto> findApartInMap(SearchMapDto searchMapDto);
 
-	ApartInfoDetailDto getApartDetail(String apartId);
+	List<ApartInfoDto> findApartByName(SearchNameDto searchNameDto);
+	ApartInfoDetailDto findApartDetail(String apartId);
 	
 	
 }

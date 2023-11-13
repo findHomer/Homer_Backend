@@ -19,18 +19,23 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 	
 	private final ApartInfoRepository apartInfoRepository;
 	@Override
-	public List<ApartInfoDto> getTotalApart() {
+	public List<ApartInfoDto> findTotalApart() {
 		return apartInfoRepository.findSimpleAll();
 	}
 	
 	@Override
-	public List<ApartInfoDto> getApartInMap(SearchMapDto searchMapDto) {
+	public List<ApartInfoDto> findApartInMap(SearchMapDto searchMapDto) {
 		
 		return apartInfoRepository.searchMap(searchMapDto);
 	}
 
 	@Override
-	public ApartInfoDetailDto getApartDetail(String apartId) {
+	public List<ApartInfoDto> findApartByName(SearchNameDto searchNameDto) {
+		return apartInfoRepository.searchName(searchNameDto);
+	}
+
+	@Override
+	public ApartInfoDetailDto findApartDetail(String apartId) {
 		 ApartInfo apartInfo =  apartInfoRepository.findById(apartId).orElseThrow(() -> new BaseException(ErrorCode.APART_NOT_FOUND));
 
 		 List<ApartDealAreaDto> apartDealAreaDtoList = new ArrayList<ApartDealAreaDto>();
@@ -54,5 +59,7 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 
 		return apartInfoDetailDto;
 	}
+
+
 
 }

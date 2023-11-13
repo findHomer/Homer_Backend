@@ -49,6 +49,9 @@ public class ApartInfo{
 	private Float latitude;
 	
 	private Float longitude;
+
+	//동코드
+	private String entireCode;
 	
 	//아파트 거래 와 1:N
 	@OneToMany(mappedBy = "apartInfo")
