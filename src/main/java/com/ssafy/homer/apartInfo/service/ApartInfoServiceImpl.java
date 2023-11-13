@@ -24,9 +24,9 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 	}
 	
 	@Override
-	public List<ApartInfoDto> getApartInMap(SearchDto searchDto) {
+	public List<ApartInfoDto> getApartInMap(SearchMapDto searchMapDto) {
 		
-		return apartInfoRepository.searchAll(searchDto);
+		return apartInfoRepository.searchAll(searchMapDto);
 	}
 
 	@Override

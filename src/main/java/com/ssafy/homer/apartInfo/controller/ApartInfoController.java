@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
-import com.ssafy.homer.apartInfo.dto.SearchDto;
+import com.ssafy.homer.apartInfo.dto.SearchMapDto;
 import com.ssafy.homer.apartInfo.service.ApartInfoService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,9 +31,9 @@ public class ApartInfoController {
 	}
 	
 	@GetMapping("/locations")
-	public ResponseEntity apartInMap(SearchDto searchDto) {
+	public ResponseEntity apartInMap(SearchMapDto searchMapDto) {
 		//System.out.println(searchDto);
-		List<ApartInfoDto> lists = apartInfoService.getApartInMap(searchDto);
+		List<ApartInfoDto> lists = apartInfoService.getApartInMap(searchMapDto);
 		return ResponseEntity.ok().body(lists);
 	}
 	

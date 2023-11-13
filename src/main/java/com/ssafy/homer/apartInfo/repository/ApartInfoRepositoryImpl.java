@@ -4,14 +4,12 @@ import java.util.List;
 
 import org.springframework.util.StringUtils;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ssafy.homer.apartInfo.domain.ApartInfo;
 import com.ssafy.homer.apartInfo.domain.QApartInfo;
 import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
-import com.ssafy.homer.apartInfo.dto.SearchDto;
+import com.ssafy.homer.apartInfo.dto.SearchMapDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,25 +19,25 @@ public class ApartInfoRepositoryImpl implements ApartInfoRepositoryCustom{
 	private final JPAQueryFactory queryFactory;
 	
 	@Override
-	public List<ApartInfoDto> searchAll(SearchDto searchDto) {
+	public List<ApartInfoDto> searchAll(SearchMapDto searchMapDto) {
 		QApartInfo  qApartInfo = QApartInfo.apartInfo;
 		List<ApartInfoDto> result=  queryFactory
 				.select(Projections.constructor(ApartInfoDto.class,qApartInfo.aptId,qApartInfo.aptName,qApartInfo.latitude,qApartInfo.longitude ))
 				.from(qApartInfo)
-				.where(allSearch(searchDto)
+				.where(allSearch(searchMapDto)
 						).fetch();
 				
 		
 		return result;
 	}
 	
-	private BooleanExpression allSearch(SearchDto searchDto) {
+	private BooleanExpression allSearch(SearchMapDto searchMapDto) {
 		
-		return betweenLat(searchDto.getStartLat(),searchDto.getEndLat())
-				.and(betweenLng(searchDto.getStartLng(),searchDto.getEndLng()))
-				.and(eqApartName(searchDto.getName()))
-				.and(eqAisleType(searchDto.getAisleType()))
-				.and(goeHouseholdCount(searchDto.getHouseholdCount()));
+		return betweenLat(searchMapDto.getStartLat(), searchMapDto.getEndLat())
+				.and(betweenLng(searchMapDto.getStartLng(), searchMapDto.getEndLng()))
+				.and(eqApartName(searchMapDto.getName()))
+				.and(eqAisleType(searchMapDto.getAisleType()))
+				.and(goeHouseholdCount(searchMapDto.getHouseholdCount()));
 				
 	}
 	

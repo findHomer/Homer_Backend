@@ -3,8 +3,8 @@ package com.ssafy.homer.apartInfo.repository;
 import java.util.List;
 
 import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
-import com.ssafy.homer.apartInfo.dto.SearchDto;
+import com.ssafy.homer.apartInfo.dto.SearchMapDto;
 
 public interface ApartInfoRepositoryCustom {
-	List<ApartInfoDto> searchAll(SearchDto searchDto);
+	List<ApartInfoDto> searchAll(SearchMapDto searchMapDto);
 }

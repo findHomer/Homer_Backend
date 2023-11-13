@@ -13,7 +13,7 @@ import lombok.ToString;
 @Builder
 @AllArgsConstructor
 @ToString
-public class SearchDto {
+public class SearchMapDto {
 	
 	/*
 	 * 지도 위치 필수 포함!!

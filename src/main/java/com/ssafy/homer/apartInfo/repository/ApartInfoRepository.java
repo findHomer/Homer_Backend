@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ssafy.homer.apartInfo.domain.ApartInfo;
 import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
-import com.ssafy.homer.apartInfo.dto.SearchDto;
+import com.ssafy.homer.apartInfo.dto.SearchMapDto;
 @Repository
 public interface ApartInfoRepository extends JpaRepository<ApartInfo,String>,ApartInfoRepositoryCustom{
 	
@@ -21,8 +21,8 @@ public interface ApartInfoRepository extends JpaRepository<ApartInfo,String>,Apa
 
 	/**
 	 * 쿼리 dsl사용하여 필터검색 구현
-	 * @param searchDto
+	 * @param searchMapDto
 	 * @return
 	 */
-	List<ApartInfoDto> searchAll(SearchDto searchDto);
+	List<ApartInfoDto> searchAll(SearchMapDto searchMapDto);
 }
