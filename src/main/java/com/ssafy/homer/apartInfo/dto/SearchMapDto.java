@@ -27,8 +27,6 @@ public class SearchMapDto {
 	@NotNull
 	private Float endLng;
 	
-	private String name;
-	
 	private String addr;
 	
 	private Float canPark;
