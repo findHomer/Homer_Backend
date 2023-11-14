@@ -48,7 +48,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    UserDetailsService users() {
+    public UserDetailsService userDetailsService() {
         // @formatter:off
         return new InMemoryUserDetailsManager(
                 MyUserDetail.builder()
@@ -62,7 +62,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return new BCryptPasswordEncoder();//Bcrypt 해쉬 알고리즘 사용
     }
 
 
