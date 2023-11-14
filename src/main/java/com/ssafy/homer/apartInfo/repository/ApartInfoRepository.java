@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.ssafy.homer.apartInfo.domain.ApartInfo;
 import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
 import com.ssafy.homer.apartInfo.dto.SearchMapDto;
+import com.ssafy.homer.apartInfo.dto.SearchNameDto;
 @Repository
 public interface ApartInfoRepository extends JpaRepository<ApartInfo,String>,ApartInfoRepositoryCustom{
 	
@@ -24,5 +25,7 @@ public interface ApartInfoRepository extends JpaRepository<ApartInfo,String>,Apa
 	 * @param searchMapDto
 	 * @return
 	 */
-	List<ApartInfoDto> searchAll(SearchMapDto searchMapDto);
+	List<ApartInfoDto> searchMap(SearchMapDto searchMapDto);
+
+	List<ApartInfoDto> searchName(SearchNameDto searchNameDto);
 }
