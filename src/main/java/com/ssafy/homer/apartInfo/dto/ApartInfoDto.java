@@ -18,6 +18,6 @@ public class ApartInfoDto {
 	
 	private String aptId;
 	private String aptName;
-	private Float latitude;
-	private Float longitude;
+	private Double lat;
+	private Double lng;
 }
