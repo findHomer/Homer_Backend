@@ -19,13 +19,13 @@ public class SearchMapDto {
 	 * 지도 위치 필수 포함!!
 	 */
 	@NotNull
-	private Float startLat;
+	private Double startLat;
 	@NotNull
-	private Float endLat;
+	private Double endLat;
 	@NotNull
-	private Float startLng;
+	private Double startLng;
 	@NotNull
-	private Float endLng;
+	private Double endLng;
 
 	private Float parkPerHouse;
 	

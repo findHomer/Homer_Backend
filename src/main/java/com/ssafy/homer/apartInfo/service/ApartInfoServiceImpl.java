@@ -50,8 +50,8 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 				 .lawAddr(apartInfo.getLawAddr())
 				 .roadAddr(apartInfo.getRoadAddr())
 				 .maxFloor(apartInfo.getMaxFloor())
-				 .latitude(apartInfo.getLatitude())
-				 .longitude(apartInfo.getLongitude())
+				 .lat(apartInfo.getLat())
+				 .lng(apartInfo.getLng())
 				 .householdCount(apartInfo.getHouseholdCount())
 				 .dealInfos(apartDealAreaDtoList)
 				 .build();

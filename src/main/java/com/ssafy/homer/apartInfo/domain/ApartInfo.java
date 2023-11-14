@@ -46,9 +46,9 @@ public class ApartInfo{
 	 
 	private Integer carCount;
 	
-	private Float latitude;
+	private Double lat;
 	
-	private Float longitude;
+	private Double lng;
 	
 	private Float parkPerHouse;
 

@@ -24,7 +24,7 @@ public class ApartInfoRepositoryImpl implements ApartInfoRepositoryCustom{
 	public List<ApartInfoDto> searchMap(SearchMapDto searchMapDto) {
 		QApartInfo  qApartInfo = QApartInfo.apartInfo;
 		List<ApartInfoDto> result=  queryFactory
-				.select(Projections.constructor(ApartInfoDto.class,qApartInfo.aptId,qApartInfo.aptName,qApartInfo.latitude,qApartInfo.longitude ))
+				.select(Projections.constructor(ApartInfoDto.class,qApartInfo.aptId,qApartInfo.aptName,qApartInfo.lat,qApartInfo.lng ))
 				.from(qApartInfo)
 				.where(mapSearch(searchMapDto)
 						).fetch();
@@ -37,7 +37,7 @@ public class ApartInfoRepositoryImpl implements ApartInfoRepositoryCustom{
 	public List<ApartInfoDto> searchName(SearchNameDto searchNameDto) {
 		QApartInfo  qApartInfo = QApartInfo.apartInfo;
 		List<ApartInfoDto> result=  queryFactory
-				.select(Projections.constructor(ApartInfoDto.class,qApartInfo.aptId,qApartInfo.aptName,qApartInfo.latitude,qApartInfo.longitude ))
+				.select(Projections.constructor(ApartInfoDto.class,qApartInfo.aptId,qApartInfo.aptName,qApartInfo.lat,qApartInfo.lng ))
 				.from(qApartInfo)
 				.where(nameSearch(searchNameDto)
 				).fetch();
@@ -92,9 +92,9 @@ public class ApartInfoRepositoryImpl implements ApartInfoRepositoryCustom{
 	 * @param endLat
 	 * @return
 	 */
-	private BooleanExpression betweenLat(Float startLat,Float endLat) {
+	private BooleanExpression betweenLat(Double startLat,Double endLat) {
 		
-		return QApartInfo.apartInfo.latitude.between(startLat, endLat);
+		return QApartInfo.apartInfo.lat.between(startLat, endLat);
 	}
 	
 	/**
@@ -103,9 +103,9 @@ public class ApartInfoRepositoryImpl implements ApartInfoRepositoryCustom{
 	 * @param endLat
 	 * @return
 	 */
-	private BooleanExpression betweenLng(Float startLng,Float endLng) {
+	private BooleanExpression betweenLng(Double startLng,Double endLng) {
 			
-			return QApartInfo.apartInfo.longitude.between(startLng, endLng);
+			return QApartInfo.apartInfo.lng.between(startLng, endLng);
 		}
 
 	/**
