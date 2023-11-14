@@ -22,6 +22,7 @@ public class AptReviewServiceImpl implements AptReviewService{
 	public boolean registerReview(ReviewDto review) {
 		ReviewEntity entity = ReviewEntity.builder()
 			   .aptId(review.getAptId())
+			   .userId(review.getUserId())
 			   .contents(review.getContents())
 			   .photoUrl(review.getPhotoUrl())
 			   .starScore(review.getStarScore())

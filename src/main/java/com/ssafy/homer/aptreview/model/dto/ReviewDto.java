@@ -1,11 +1,10 @@
 package com.ssafy.homer.aptreview.model.dto;
 
-import java.sql.Date;
-
-import com.ssafy.homer.aptreview.model.ReviewToDto;
+import java.sql.Timestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +35,6 @@ public class ReviewDto{
 	private Float starScore;
 	
 	//등록일자
-	private Date createdAt;
+	private Timestamp createdAt;
 
 }

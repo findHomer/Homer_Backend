@@ -15,11 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ssafy.homer.aptreview.model.dto.ReviewDto;
 import com.ssafy.homer.aptreview.model.service.AptReviewService;
 
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/v1/review")
 @RequiredArgsConstructor
+@Slf4j
 public class AptReviewController {
 	
 	private final AptReviewService aptReviewService;
