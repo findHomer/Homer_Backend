@@ -8,12 +8,12 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 public class MapLocaionDto {
-	private Float startLat;
+	private Double startLat;
 	
-	private Float endLat;
+	private Double endLat;
 	
-	private Float startLng;
+	private Double startLng;
 	
-	private Float endLng;
+	private Double endLng;
 	
 }
