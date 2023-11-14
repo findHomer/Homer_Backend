@@ -26,10 +26,8 @@ public class SearchMapDto {
 	private Float startLng;
 	@NotNull
 	private Float endLng;
-	
-	private String addr;
-	
-	private Float canPark;
+
+	private Float parkPerHouse;
 	
 	private String aisleType;
 	

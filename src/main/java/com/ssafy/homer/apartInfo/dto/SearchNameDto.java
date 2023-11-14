@@ -13,12 +13,12 @@ import lombok.*;
 @ToString
 public class SearchNameDto {
 
-    @NotNull
+   
     private String name;
 
     private String dongCode;
 
-    private Float canPark;
+    private Float parkPerHouse;
 
     private String aisleType;
 
