@@ -46,22 +46,34 @@ public class ApartInfoRepositoryImpl implements ApartInfoRepositoryCustom{
 		return result;
 	}
 
+	/**
+	 * 이름,동 기준으로 검색할때 부르는 쿼리
+	 * @param searchNameDto
+	 * @return
+	 */
 	private BooleanExpression nameSearch(SearchNameDto searchNameDto) {
 
 		return containsName(searchNameDto.getName())
-				//.and(startWithDongCode(searchNameDto.getDongCode()))
+				.and(startWithDongCode(searchNameDto.getDongCode()))
 				.and(eqAisleType(searchNameDto.getAisleType()))
+				.and(goeParkPerHouse(searchNameDto.getParkPerHouse()))
 				.and(goeHouseholdCount(searchNameDto.getHouseholdCount()));
 	}
 
 
+	/**
+	 * 마우스로 지도 이동시킬때 부르는 쿼리
+	 * @param searchMapDto
+	 * @return
+	 */
 	private BooleanExpression mapSearch(SearchMapDto searchMapDto) {
 		
 		return betweenLat(searchMapDto.getStartLat(), searchMapDto.getEndLat())
 				.and(betweenLng(searchMapDto.getStartLng(), searchMapDto.getEndLng()))
 				.and(eqAisleType(searchMapDto.getAisleType()))
+				.and(goeParkPerHouse(searchMapDto.getParkPerHouse()))
 				.and(goeHouseholdCount(searchMapDto.getHouseholdCount()));
-		//세대당 주차수
+		
 				
 	}
 
@@ -96,20 +108,19 @@ public class ApartInfoRepositoryImpl implements ApartInfoRepositoryCustom{
 			return QApartInfo.apartInfo.longitude.between(startLng, endLng);
 		}
 
-
-//	private BooleanExpression goeCanPark(Integer canPark,Integer householdCount){//세대당 주차수 따로 필드 만들 필요가있음
-//		if(canPark==null||householdCount==null||householdCount==0){
-//			return null;
-//		}
-//
-//		return QApartInfo.apartInfo.
-	//}
-	private BooleanExpression eqApartName(String apartName) {
-		if(!StringUtils.hasText(apartName)) {
+	/**
+	 * 세대당 주차수 이상을 찾음
+	 * @param parkPerHouse
+	 * @return
+	 */
+	private BooleanExpression goeParkPerHouse(Float parkPerHouse){
+		if(parkPerHouse==null||parkPerHouse==0.0){
 			return null;
 		}
-		return QApartInfo.apartInfo.aptName.eq(apartName);
+
+		return QApartInfo.apartInfo.parkPerHouse.goe(parkPerHouse);
 	}
+	
 	
 	private BooleanExpression eqAisleType(String aisleType) {
 		if(!StringUtils.hasText(aisleType)) {
@@ -125,13 +136,13 @@ public class ApartInfoRepositoryImpl implements ApartInfoRepositoryCustom{
 		return QApartInfo.apartInfo.householdCount.goe(householdCount);
 	}
 	
-	//동코드
-//	private BooleanExpression startWithDongCode(String dongCode) {
-//		if(!StringUtils.hasText(dongCode)){
-//			return null;
-//		}
-//		return QApartInfo.apartInfo.
-//	}
+	//입력된 동코드로 시작하는지
+	private BooleanExpression startWithDongCode(String dongCode) {
+		if(!StringUtils.hasText(dongCode)){
+			return null;
+		}
+		return QApartInfo.apartInfo.entireCode.startsWith(dongCode);
+	}
 	
 	
 	
