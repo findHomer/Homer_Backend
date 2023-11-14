@@ -17,15 +17,13 @@ import java.util.Date;
 public class ApartDeal {
 
     @Id
-    private Integer dealId;
+    private Long dealId;
 
-    private String aptId;
-
-    private Integer transactionAmount;
+    private String transactionAmount;
 
     private String transactionType;
 
-    private Integer transactionYear;
+    private String constructionYear;
 
     private Float exclusiveArea;
 
