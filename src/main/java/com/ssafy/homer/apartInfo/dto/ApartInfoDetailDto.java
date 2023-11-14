@@ -32,11 +32,14 @@ public class ApartInfoDetailDto {
 
 	private Integer maxFloor;
 	
-	private Float canPark;
+	private Integer carCount;
 
 	private Float latitude;
 	
 	private Float longitude;
+	
+	private Float parkPerHouse;
+	
 
 	private List<ApartDealAreaDto> dealInfos;
 }

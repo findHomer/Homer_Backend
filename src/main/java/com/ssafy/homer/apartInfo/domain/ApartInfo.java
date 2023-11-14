@@ -49,6 +49,8 @@ public class ApartInfo{
 	private Float latitude;
 	
 	private Float longitude;
+	
+	private Float parkPerHouse;
 
 	//동코드
 	@Column(columnDefinition = "char")

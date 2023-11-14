@@ -46,7 +46,7 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 				 .aisleType(apartInfo.getAisleType())
 				 .allowDate(apartInfo.getAllowDate())
 				 .aptName(apartInfo.getAptName())
-				 .canPark((float)apartInfo.getCarCount()/apartInfo.getHouseholdCount())//소수점자릿수 체크
+				 .parkPerHouse(apartInfo.getParkPerHouse())//소수점자릿수 체크
 				 .lawAddr(apartInfo.getLawAddr())
 				 .roadAddr(apartInfo.getRoadAddr())
 				 .maxFloor(apartInfo.getMaxFloor())
