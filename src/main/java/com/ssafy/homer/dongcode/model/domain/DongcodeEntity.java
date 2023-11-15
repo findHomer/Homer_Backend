@@ -2,6 +2,11 @@ package com.ssafy.homer.dongcode.model.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import org.hibernate.annotations.GeneratorType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,19 +22,20 @@ import lombok.Setter;
 @Entity(name = "dongcode")
 public class DongcodeEntity {
 
-	@Column
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(columnDefinition ="char(10)")
 	String entireCode;
 	
 	@Column
 	String name;
 	
-	@Column
+	@Column(columnDefinition ="char(2)")
 	String sidoCode;
 	
-	@Column
+	@Column(columnDefinition ="char(3)")
 	String sigunguCode;
-	
-	@Column
+
+	@Column(columnDefinition ="char(5)")
 	String dongCode;
 	
 	@Column
