@@ -1,18 +1,22 @@
 package com.ssafy.homer.user.jwt;
 
+import java.util.Date;
+
 import org.springframework.stereotype.Component;
 
 import com.ssafy.homer.user.domain.User;
 import io.jsonwebtoken.*;
-
+import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Component
 public class JwtUtil {
 	
-	public String SECRET_KEY = "12321313";
+	public static String SECRET_KEY = "12321313asdsadsadadsadsadsadsadsadsadsa";
 	
-	private final Long accessTokenExpireTime = 1000L*60*60;// 1시간
+	private static final Long accessTokenExpireTime = 1000L*60*60;// 1시간
 	
-	private final Long refreshTokenExpireTime = 1000L*30*60*60*24; // 30일
+	private static final Long refreshTokenExpireTime = 1000L*30*60*60*24; // 30일
 	/**
      * user로 토큰 생성
      * HEADER : alg, kid
@@ -22,7 +26,7 @@ public class JwtUtil {
      * @param User 유저
      * @return jwt accesstoken
      */
-	public static String createAccessToken(User user) {
+	public String createAccessToken(User user) {
         Claims claims = Jwts.claims().setSubject(user.getEmail()); // subject
         Date now = new Date(); // 현재 시간
        
@@ -38,7 +42,7 @@ public class JwtUtil {
     }
 	
 	
-	public static String createRefreshToken(User user) {
+	public String createRefreshToken(User user) {
         Claims claims = Jwts.claims().setSubject(user.getEmail()); // subject
         Date now = new Date(); // 현재 시간
        
@@ -52,4 +56,33 @@ public class JwtUtil {
                 .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()),SignatureAlgorithm.HS256) // signature
                 .compact();
     }
+	
+	public Claims verifyAccessToken(String accessToken) {
+		try{
+			return Jwts.parserBuilder()
+	                .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+	                .build()
+	                .parseClaimsJws(accessToken)
+	                .getBody();
+		
+		} catch (SecurityException e) {
+	        log.info("Invalid JWT signature.");
+	        //throw new CustomJwtRuntimeException();
+	    } catch (MalformedJwtException e) {
+	        log.info("Invalid JWT token.");
+	        //throw new CustomJwtRuntimeException();
+	    } catch (ExpiredJwtException e) {
+	        log.info("Expired JWT token.");
+	       // throw new CustomJwtRuntimeException();
+	    } catch (UnsupportedJwtException e) {
+	        log.info("Unsupported JWT token.");
+	        //throw new CustomJwtRuntimeException();
+	    } catch (IllegalArgumentException e) {
+	        log.info("JWT token compact of handler are invalid.");
+	       // throw new CustomJwtRuntimeException();
+	    }
+		
+		return null;
+	}
+	
 }
