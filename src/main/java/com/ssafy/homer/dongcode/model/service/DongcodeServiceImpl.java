@@ -24,7 +24,7 @@ public class DongcodeServiceImpl implements DongcodeService{
 		
 		List<DongcodeDto> result = entities.stream()
 		.map(m -> DongcodeDto.builder()
-				.code(m.getEntireCode())
+				.code(m.getSidoCode())
 				.name(m.getSidoName())
 				.build())
 		.collect(Collectors.toList());
@@ -35,12 +35,12 @@ public class DongcodeServiceImpl implements DongcodeService{
 	@Override
 	public List<DongcodeDto> getSigunguList(String sidoCode) throws Exception {
 		
-		List<DongcodeEntity> entities = dongcodeRepository.getNextList(sidoCode.substring(0,2) + "___00000");
+		List<DongcodeEntity> entities = dongcodeRepository.getNextList(sidoCode + "___00000");
 		
 		List<DongcodeDto> result = entities.stream()
 				.filter(m -> !m.getSigunguCode().equals("000"))
 		.map(m -> DongcodeDto.builder()
-				.code(m.getEntireCode())
+				.code(m.getSigunguCode())
 				.name(m.getSigunguName())
 				.build())
 		.collect(Collectors.toList());
@@ -50,13 +50,13 @@ public class DongcodeServiceImpl implements DongcodeService{
 
 	@Override
 	public List<DongcodeDto> getDongList(String sigunguCode) throws Exception {
-		List<DongcodeEntity> entities = dongcodeRepository.getNextList(sigunguCode.substring(0,5) + "_____");
+		List<DongcodeEntity> entities = dongcodeRepository.getNextList(sigunguCode + "_____");
 		
 		List<DongcodeDto> result = entities.stream()
 				.filter(m -> !m.getDongCode().equals("00000"))
 				.map(m -> 
 					DongcodeDto.builder()
-						.code(m.getEntireCode())
+						.code(m.getDongCode())
 						.name(m.getDongName())
 						.build()
 				)
