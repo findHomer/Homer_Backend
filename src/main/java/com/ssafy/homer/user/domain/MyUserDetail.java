@@ -10,21 +10,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 @Getter
 @Setter
 @Builder
 public class MyUserDetail implements UserDetails {
 
-    private String email;
+    private User user;
 
-    private String password;
-
-    private String roles;
+  
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
 
-        for(String role : roles.split(",")){
+        for(String role : user.getRole().split(",")){
             authorities.add(new SimpleGrantedAuthority(role));
         }
         return authorities;
@@ -32,12 +31,12 @@ public class MyUserDetail implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return email;
+        return user.getPassword();
     }
 
     @Override
@@ -59,4 +58,8 @@ public class MyUserDetail implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+	public MyUserDetail(User user) {
+		this.user=user;
+	}
 }
