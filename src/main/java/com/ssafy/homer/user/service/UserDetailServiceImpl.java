@@ -1,5 +1,6 @@
 package com.ssafy.homer.user.service;
 
+import com.ssafy.homer.user.domain.MyUserDetail;
 import com.ssafy.homer.user.domain.User;
 import com.ssafy.homer.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +20,11 @@ public class UserDetailServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUserId(Integer.valueOf(userId));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email).orElseThrow(null);
+        	
 
-
-        return null;
+        return new MyUserDetail(user);
     }
 
 }
