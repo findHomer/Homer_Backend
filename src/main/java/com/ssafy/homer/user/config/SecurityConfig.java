@@ -74,23 +74,6 @@ public class SecurityConfig{
         return http.build();
     }
 
-//    @Bean
-//    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-//    	JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager(http),jwtUtil);
-//    	
-//    	return jwtAuthenticationFilter;
-//    }
-    
-   
-    
-    
-    
-//    @Bean
-//    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-//        return http.getSharedObject(AuthenticationManagerBuilder.class)
-//                .build();
-//    }
-   
 
     @Bean
     public PasswordEncoder passwordEncoder() {

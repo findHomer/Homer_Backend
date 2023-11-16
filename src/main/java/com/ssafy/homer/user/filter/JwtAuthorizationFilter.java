@@ -1,6 +1,8 @@
 package com.ssafy.homer.user.filter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -8,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -16,7 +20,6 @@ import com.ssafy.homer.user.domain.MyUserDetail;
 import com.ssafy.homer.user.domain.User;
 import com.ssafy.homer.user.jwt.JwtUtil;
 import com.ssafy.homer.user.repository.UserRepository;
-import com.sun.org.apache.xml.internal.security.algorithms.JCEMapper.Algorithm;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -46,11 +49,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter{
             // === Access Token 검증 === //
 
             Claims jwtClaim = jwtUtil.verifyAccessToken(accessToken);
+            //권한 claim에 추가해 db 호출 줄일 수 있음(개선필요)
             String email = jwtClaim.getSubject();
+            String authority = jwtClaim.get("roles",String.class);
+            System.out.println(authority);
+            //User user = userRepository.findByEmail(email).orElseThrow(()-> new RuntimeException());
+           // MyUserDetail userDetails = new MyUserDetail(user);
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
 
-            User user = userRepository.findByEmail(email).orElseThrow(()-> new RuntimeException());
-            MyUserDetail userDetails = new MyUserDetail(user);
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, userDetails.getAuthorities());//authority
+            for(String role : authority.split(",")){
+                authorities.add(new SimpleGrantedAuthority(role));
+            }
+            //user를 securityContext에 principal로 등록
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, null, authorities);//authority
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
             filterChain.doFilter(request, response);

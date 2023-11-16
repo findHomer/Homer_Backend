@@ -28,6 +28,7 @@ public class JwtUtil {
      */
 	public String createAccessToken(User user) {
         Claims claims = Jwts.claims().setSubject(user.getEmail()); // subject
+        claims.put("roles", user.getRole());
         Date now = new Date(); // 현재 시간
        
         // JWT Token 생성
