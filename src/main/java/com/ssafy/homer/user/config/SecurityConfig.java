@@ -7,6 +7,7 @@ import com.ssafy.homer.user.jwt.JwtUtil;
 import com.ssafy.homer.user.repository.UserRepository;
 import com.ssafy.homer.user.service.UserDetailServiceImpl;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -27,6 +28,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -44,11 +51,24 @@ public class SecurityConfig{
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     	
     	AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
+        http.cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+            @Override
+            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowedOriginPatterns(List.of("*"));
+                config.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowCredentials(true);
+                config.setAllowedHeaders(Collections.singletonList("*"));
+                config.setMaxAge(3600L); //1시간
+                return config;
+            }
+        }));
 
         http    .httpBasic().disable()
                 .rememberMe().disable()
                 .formLogin().disable()
                 .csrf().disable()
+
                 .apply(new MyCustomDsl()) // 커스텀 필터 등록
 				.and()
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

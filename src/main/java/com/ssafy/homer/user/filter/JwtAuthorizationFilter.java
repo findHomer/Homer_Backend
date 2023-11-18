@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ssafy.homer.user.domain.MyUserDetail;
@@ -38,7 +39,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter{
         
             // Access Token만 꺼내옴
             String accessToken = null;
-            if (authorizationHeader != null)
+            if (StringUtils.hasText(authorizationHeader))
                 accessToken = authorizationHeader.substring("Bearer ".length());
             else{//permitall 통과
                 SecurityContextHolder.getContext().setAuthentication(null);
