@@ -1,8 +1,8 @@
 package com.ssafy.homer.apartInfo.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+import com.ssafy.homer.apartInfo.domain.ApartDeal;
 import com.ssafy.homer.apartInfo.domain.ApartInfo;
 import com.ssafy.homer.apartInfo.dto.*;
 import com.ssafy.homer.apartInfo.exception.BaseException;
@@ -39,8 +39,27 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 		 ApartInfo apartInfo =  apartInfoRepository.findById(apartId).orElseThrow(() -> new BaseException(ErrorCode.APART_NOT_FOUND));
 
 		 List<ApartDealAreaDto> apartDealAreaDtoList = new ArrayList<ApartDealAreaDto>();
-		 //apartDealAreaDtoList 구현필요
 
+		 //전용면적을 key로 apartDealDto를 넣어줌
+		TreeMap<Float,ArrayList<ApartDealDto>> map = new TreeMap<>();
+		for(ApartDeal deal: apartInfo.getApartDealList()){
+			ArrayList<ApartDealDto> arr = map.getOrDefault(deal.getExclusiveArea(),new ArrayList<ApartDealDto>());
+
+			arr.add(ApartDealDto.builder()
+					.dealId(deal.getDealId())
+					.floor(deal.getFloor())
+					.transactionAmount(deal.getTransactionAmount().trim())
+					.transactionDate(deal.getTransactionDate())
+					.build());
+
+			map.put(deal.getExclusiveArea(),arr);
+		}
+
+		for(Map.Entry<Float,ArrayList<ApartDealDto>> e: map.entrySet()){
+			apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(),e.getValue()));
+		}
+
+		//
 		 ApartInfoDetailDto apartInfoDetailDto = ApartInfoDetailDto.builder()
 				 .aptId(apartInfo.getAptId())
 				 .aisleType(apartInfo.getAisleType())
@@ -55,7 +74,6 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 				 .householdCount(apartInfo.getHouseholdCount())
 				 .dealInfos(apartDealAreaDtoList)
 				 .build();
-
 
 		return apartInfoDetailDto;
 	}

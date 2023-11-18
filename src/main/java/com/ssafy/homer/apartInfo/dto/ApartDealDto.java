@@ -17,9 +17,9 @@ import java.util.Date;
 @Builder
 public class ApartDealDto {
 
-    private Integer dealId;
+    private Long dealId;
 
-    private Integer transactionAmount;
+    private String transactionAmount;
 
     private Date transactionDate;
 
