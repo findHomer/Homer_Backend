@@ -33,7 +33,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig{
 	
 	private final JwtUtil jwtUtil;
-	private final UserRepository userRepository;
 	
     /**
      * securityFilterChain을 생성하는 부분 -> 체인의 순서를 결정
@@ -55,7 +54,7 @@ public class SecurityConfig{
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
                         // /api 시작하는 URL에 대한 접근 제어
-                		.antMatchers("/api/v1/users/ping","/login").permitAll()
+                		.antMatchers("/api/v1/users/ping","/api/v1/login","/api/v1/users/signup").permitAll()
                         .antMatchers("/api/v1/users/**").hasAnyRole("USER", "ADMIN")
                         // /admin 시작하는 URL에 대한 접근 제어
                         .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
@@ -89,7 +88,7 @@ public class SecurityConfig{
 			http
 					
 				.addFilterAt(new JwtAuthenticationFilter(authenticationManager,jwtUtil), UsernamePasswordAuthenticationFilter.class)//usernamePasswordAuthenticationFilter위치에 커스텀한 인증필터 대체
-				.addFilterAfter(new JwtAuthorizationFilter(userRepository,jwtUtil), JwtAuthenticationFilter.class);
+				.addFilterAfter(new JwtAuthorizationFilter(jwtUtil), JwtAuthenticationFilter.class);
             }
 	}
     

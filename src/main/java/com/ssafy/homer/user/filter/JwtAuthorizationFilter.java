@@ -25,8 +25,7 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter{
-	
-	private final UserRepository userRepository;
+
 	private final JwtUtil jwtUtil;
 	
 	@Override

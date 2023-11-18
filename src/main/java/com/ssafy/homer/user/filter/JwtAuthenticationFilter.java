@@ -28,7 +28,6 @@ import com.ssafy.homer.user.jwt.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
 //config 에서 의존하는 Bean을 주입
 	
@@ -38,7 +37,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	private final JwtUtil jwtUtil;
 	//private final ProviderManager manager;
 	//private final DaoAuthenticationProvider st; 
-	
+
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager,JwtUtil jwtUtil){
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        super.setFilterProcessesUrl("/api/v1/login");
+    }
     
 	
 	/**
