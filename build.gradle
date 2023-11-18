@@ -1,12 +1,12 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '2.7.17'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+    id 'org.springframework.boot' version '2.7.17'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10' // QueryDSL 플러그인
 }
 
 group = 'com.ssafy'
 version = '0.0.1-SNAPSHOT'
-
 java {
 	sourceCompatibility = '8'
 }
@@ -18,7 +18,11 @@ configurations {
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+}
+
+ext {
+    queryDslVersion = '5.0.0' // QueryDSL 버전
 }
 
 dependencies {
@@ -36,8 +40,39 @@ dependencies {
 	implementation "io.jsonwebtoken:jjwt-api:0.11.5"
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:0.11.5"
 	implementation "io.jsonwebtoken:jjwt-jackson:0.11.5"
+    //test 관련 의존성 설정
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testCompileOnly  'org.projectlombok:lombok'
+    testAnnotationProcessor  'org.projectlombok:lombok'
+
+    // QueryDSL 관련 의존성
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+}
+
+// QueryDSL 소스 디렉토리 설정
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+    main.java.srcDir querydslDir
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+}
+
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
