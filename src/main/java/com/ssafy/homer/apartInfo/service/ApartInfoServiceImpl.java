@@ -1,5 +1,7 @@
 package com.ssafy.homer.apartInfo.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.ssafy.homer.apartInfo.domain.ApartDeal;
@@ -54,9 +56,33 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 
 			map.put(deal.getExclusiveArea(),arr);
 		}
+		LocalDate threeYearsAgo = LocalDate.now().minusYears(3);
 
 		for(Map.Entry<Float,ArrayList<ApartDealDto>> e: map.entrySet()){
-			apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(),e.getValue()));
+			Map<String, MonthlyData> monthlyDataMap = new HashMap<>();
+			for(ApartDealDto deal: e.getValue()) {
+				LocalDate transactionDate = deal.getTransactionDate();
+
+				// 최근 3년 데이터만 처리
+				if (transactionDate.isAfter(threeYearsAgo)) {
+					String monthYearKey = transactionDate.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+					MonthlyData monthlyData = monthlyDataMap.getOrDefault(monthYearKey, new MonthlyData());
+
+					monthlyData.addDeal(Integer.parseInt(deal.getTransactionAmount().replace(",", "")));
+					monthlyDataMap.put(monthYearKey, monthlyData);
+				}
+
+			}
+			ArrayList<AverageMonthDto> averageMonthDtos = new ArrayList<>();
+			LocalDate startDate = LocalDate.now().minusYears(3);
+			LocalDate endDate = LocalDate.now();
+
+			while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
+
+				averageMonthDtos.add(new AverageMonthDto(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")),monthlyDataMap.getOrDefault(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")),new MonthlyData()).getAverage()));
+				startDate = startDate.plusMonths(1);
+			}
+			apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(),e.getValue(),averageMonthDtos));
 		}
 
 		//
@@ -68,6 +94,7 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 				 .parkPerHouse(apartInfo.getParkPerHouse())//소수점자릿수 체크
 				 .lawAddr(apartInfo.getLawAddr())
 				 .roadAddr(apartInfo.getRoadAddr())
+				 .dongCount(apartInfo.getDongCount())
 				 .maxFloor(apartInfo.getMaxFloor())
 				 .lat(apartInfo.getLat())
 				 .lng(apartInfo.getLng())
@@ -80,4 +107,18 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 
 
 
+}
+class MonthlyData {
+	// 월별 데이터 집계 클래스
+	private int totalAmount = 0;
+	private int count = 0;
+
+	public void addDeal(int amount) {
+		totalAmount += amount;
+		count++;
+	}
+
+	public float getAverage() {
+		return count == 0 ? 0 : (float) totalAmount / count;
+	}
 }

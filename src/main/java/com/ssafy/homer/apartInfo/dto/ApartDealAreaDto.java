@@ -21,5 +21,5 @@ public class ApartDealAreaDto {
 
     private ArrayList<ApartDealDto> apartDealDto;
 
-
+    private ArrayList<AverageMonthDto> averageMonthDto;
 }

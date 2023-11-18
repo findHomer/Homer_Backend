@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity(name="apart_deal")
@@ -29,7 +30,7 @@ public class ApartDeal {
 
     private Integer floor;
 
-    private Date transactionDate;
+    private LocalDate transactionDate;
 
     @ManyToOne
     @JoinColumn(name = "apt_id")

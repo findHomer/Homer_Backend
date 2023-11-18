@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -21,7 +22,7 @@ public class ApartDealDto {
 
     private String transactionAmount;
 
-    private Date transactionDate;
+    private LocalDate transactionDate;
 
     private Integer floor;
 
