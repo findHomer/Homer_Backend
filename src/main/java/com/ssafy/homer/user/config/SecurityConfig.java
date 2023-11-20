@@ -5,6 +5,7 @@ import com.ssafy.homer.user.filter.JwtAuthenticationFilter;
 import com.ssafy.homer.user.filter.JwtAuthorizationFilter;
 import com.ssafy.homer.user.jwt.JwtUtil;
 import com.ssafy.homer.user.repository.UserRepository;
+import com.ssafy.homer.user.service.RedisService;
 import com.ssafy.homer.user.service.UserDetailServiceImpl;
 
 import java.util.List;
@@ -38,7 +39,7 @@ import java.util.Collections;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig{
-	
+	private final RedisService redisService;
 	private final JwtUtil jwtUtil;
 	
     /**
@@ -107,7 +108,7 @@ public class SecurityConfig{
 			AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
 			http
 					
-				.addFilterAt(new JwtAuthenticationFilter(authenticationManager,jwtUtil), UsernamePasswordAuthenticationFilter.class)//usernamePasswordAuthenticationFilter위치에 커스텀한 인증필터 대체
+				.addFilterAt(new JwtAuthenticationFilter(redisService,authenticationManager,jwtUtil), UsernamePasswordAuthenticationFilter.class)//usernamePasswordAuthenticationFilter위치에 커스텀한 인증필터 대체
 				.addFilterAfter(new JwtAuthorizationFilter(jwtUtil), JwtAuthenticationFilter.class);
             }
 	}

@@ -12,6 +12,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ssafy.homer.user.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,14 +32,15 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
 //config 에서 의존하는 Bean을 주입
 	
-	//private final RedisService redisService;
+	private final RedisService redisService;
 	
 	private final AuthenticationManager authenticationManager;
 	private final JwtUtil jwtUtil;
 	//private final ProviderManager manager;
 	//private final DaoAuthenticationProvider st; 
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager,JwtUtil jwtUtil){
+    public JwtAuthenticationFilter(RedisService redisService,AuthenticationManager authenticationManager,JwtUtil jwtUtil){
+        this.redisService = redisService;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         super.setFilterProcessesUrl("/api/v1/login");
@@ -93,7 +95,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         
         String accessToken = jwtUtil.createAccessToken(user.getUser());
         String refreshToken = jwtUtil.createRefreshToken(user.getUser());
-        //redisService.saveRefreshToken(member.getEmail(),token.get("refreshToken"));
+
+        // Redis에 Refresh Token 저장
+        redisService.saveRefreshToken(user.getUsername(),refreshToken);
+
         response.setContentType("application/json");
         
         Map<String, String> token = new HashMap<>();
@@ -108,10 +113,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // 필요한 경우 도메인, 유효기간 등을 설정
         response.addCookie(refreshTokenCookie);
 
-        // Redis에 Refresh Token 저장
-        // redisService.saveRefreshToken(user.getEmail(), refreshToken);
-
-       
 
     }
 

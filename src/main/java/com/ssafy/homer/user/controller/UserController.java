@@ -1,11 +1,9 @@
 package com.ssafy.homer.user.controller;
 
+import com.ssafy.homer.user.jwt.JwtUtil;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import com.ssafy.homer.user.dto.SignupDto;
 import com.ssafy.homer.user.service.UserService;
@@ -17,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
 	private final UserService userService;
-	
+
 	@PostMapping("/signup")
 	public ResponseEntity signup(@RequestBody SignupDto signupDto) {
 		System.out.println(signupDto);
@@ -47,7 +45,14 @@ public class UserController {
 		//userService.addProfile()
 		return ResponseEntity.ok().build();
 	}
-	
+
+	@PostMapping("/slient-refresh")
+	public ResponseEntity refresh(@CookieValue String refreshToken){
+
+		String accessToken = userService.refresh(refreshToken);
+
+		return ResponseEntity.ok().body(accessToken);
+	}
 	@GetMapping("/ping")
 	public ResponseEntity pong() {
 		return ResponseEntity.ok("pong");
