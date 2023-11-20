@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.ssafy.homer.user.dto.RefreshTokenDto;
 import com.ssafy.homer.user.jwt.JwtUtil;
 import com.ssafy.homer.user.repository.RedisRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -52,8 +53,16 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public MyPageDto getMyInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+		System.out.println("email "+email);
+		User user = userRepository.findByEmail(email).orElseThrow();
+
+		return MyPageDto.builder()
+				.name(user.getName())
+				.nickname(user.getNickname())
+				.birth(user.getBirth())
+				.profileUrl(user.getUserPhoto())
+				.build();
 	}
 
 	@Override

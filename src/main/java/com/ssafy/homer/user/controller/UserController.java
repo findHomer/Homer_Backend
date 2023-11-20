@@ -1,5 +1,6 @@
 package com.ssafy.homer.user.controller;
 
+import com.ssafy.homer.user.dto.MyPageDto;
 import com.ssafy.homer.user.jwt.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,8 +33,8 @@ public class UserController {
 	
 	@GetMapping("/mypage")
 	public ResponseEntity mypage() {
-		//userService.getMyInfo();
-		return ResponseEntity.ok().build();
+		MyPageDto mypageDto = userService.getMyInfo();
+		return ResponseEntity.ok().body(mypageDto);
 	}
 	
 	/**
