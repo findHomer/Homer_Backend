@@ -85,5 +85,33 @@ public class JwtUtil {
 		
 		return null;
 	}
+
+	public String getEmail(String token) {
+		try{
+			return Jwts.parserBuilder()
+					.setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+					.build()
+					.parseClaimsJws(token)
+					.getBody().getSubject();
+
+		} catch (SecurityException e) {
+			log.info("Invalid JWT signature.");
+			//throw new CustomJwtRuntimeException();
+		} catch (MalformedJwtException e) {
+			log.info("Invalid JWT token.");
+			//throw new CustomJwtRuntimeException();
+		} catch (ExpiredJwtException e) {
+			log.info("Expired JWT token.");
+			// throw new CustomJwtRuntimeException();
+		} catch (UnsupportedJwtException e) {
+			log.info("Unsupported JWT token.");
+			//throw new CustomJwtRuntimeException();
+		} catch (IllegalArgumentException e) {
+			log.info("JWT token compact of handler are invalid.");
+			// throw new CustomJwtRuntimeException();
+		}
+
+		return null;
+	}
 	
 }
