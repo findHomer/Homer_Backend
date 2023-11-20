@@ -10,4 +10,6 @@ public interface UserService {
 	public void logout();
 
 	public MyPageDto getMyInfo();
+
+	public String refresh(String refreshToken);
 }
