@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.security.Security;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -57,5 +58,13 @@ public class BookmarkServiceImpl implements BookmarkService{
         bookmarkRepository.save(bookmark);
         //SQLIntegrityConstraintViolationException  키중복에러 발생가능
 
+    }
+
+    @Override
+    public List<Bookmark> getBookmark() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        return user.getBookmarkList();
     }
 }
