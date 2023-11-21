@@ -33,6 +33,7 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 
 	@Override
 	public List<ApartInfoDto> findApartByName(SearchNameDto searchNameDto) {
+		System.out.println(searchNameDto);
 		return apartInfoRepository.searchName(searchNameDto);
 	}
 
@@ -79,7 +80,7 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 
 			while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
 
-				averageMonthDtos.add(new AverageMonthDto(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")),monthlyDataMap.getOrDefault(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")),new MonthlyData()).getAverage()));
+				averageMonthDtos.add(new AverageMonthDto(startDate.format(DateTimeFormatter.ofPattern("yy.MM")),monthlyDataMap.getOrDefault(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")),new MonthlyData()).getAverage()));
 				startDate = startDate.plusMonths(1);
 			}
 			apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(),e.getValue(),averageMonthDtos));

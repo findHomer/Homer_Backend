@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.util.*;
 
 
+import com.ssafy.homer.bookmark.domain.Bookmark;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,4 +63,6 @@ public class ApartInfo{
 	//리뷰와 1:N
 	
 	//즐겨찾기와  1:N
+	@OneToMany(mappedBy ="apartInfo")
+	private List<Bookmark> bookmarkList;
 }
