@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService{
 	public MyPageDto getMyInfo() {
 		String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
 		System.out.println("email "+email);
-		User user = userRepository.findByEmail(email).orElseThrow();
+		User user = userRepository.findByEmail(email).orElseThrow(null);
 
 		return MyPageDto.builder()
 				.name(user.getName())
@@ -68,9 +68,9 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public String refresh(String refreshToken) {
 		String email = jwtUtil.getEmail(refreshToken);
-		RefreshTokenDto realRefreshToken = redisRepository.findById(email).orElseThrow();
+		RefreshTokenDto realRefreshToken = redisRepository.findById(email).orElseThrow(null);
 		if(refreshToken.equals(realRefreshToken)){
-			User user = userRepository.findByEmail(email).orElseThrow();
+			User user = userRepository.findByEmail(email).orElseThrow(null);
 			return jwtUtil.createAccessToken(user);
 		}
 		return null;

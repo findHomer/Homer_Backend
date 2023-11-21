@@ -29,12 +29,12 @@ public class BookmarkServiceImpl implements BookmarkService{
     @Override
     public void deleteBookmark(BookmarkDelDto bookmarkDelDto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(null);
         //인증객체에 email이아닌 ID 넣을지 고려 할 필요성 있음
 
         Long bookmarkId = bookmarkDelDto.getBookmarkId();
         //본인이 체크한 북마크인지 확인
-        Bookmark bookmark = bookmarkRepository.findById(bookmarkId).orElseThrow();
+        Bookmark bookmark = bookmarkRepository.findById(bookmarkId).orElseThrow(null);
         if(bookmark.getUser().equals(user)){
             bookmarkRepository.delete(bookmark);
         }else{
@@ -47,8 +47,8 @@ public class BookmarkServiceImpl implements BookmarkService{
     public void addBookmark(BookmarkDto bookmarkDto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
 
-        User user = userRepository.findByEmail(email).orElseThrow();
-        ApartInfo apartInfo = apartInfoRepository.findById(bookmarkDto.getAptId()).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(null);
+        ApartInfo apartInfo = apartInfoRepository.findById(bookmarkDto.getAptId()).orElseThrow(null);
 
         Bookmark bookmark = Bookmark.builder()
                 .user(user)
@@ -63,7 +63,7 @@ public class BookmarkServiceImpl implements BookmarkService{
     @Override
     public List<Bookmark> getBookmark() {
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(null);
 
         return user.getBookmarkList();
     }

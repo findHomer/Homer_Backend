@@ -95,7 +95,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         
         String accessToken = jwtUtil.createAccessToken(user.getUser());
         String refreshToken = jwtUtil.createRefreshToken(user.getUser());
-
+        ;
         // Redis에 Refresh Token 저장
         redisService.saveRefreshToken(user.getUsername(),refreshToken);
 
@@ -104,15 +104,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Map<String, String> token = new HashMap<>();
         token.put("accessToken", accessToken);
         response.setContentType("application/json");
-        new ObjectMapper().writeValue(response.getWriter(),token);
+        
         
         // Refresh Token을 HttpOnly 쿠키로 설정
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        // expires in 30 days
+        refreshTokenCookie.setMaxAge(30 * 24 * 60 * 60);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setPath("/"); // 쿠키 경로 설정
         // 필요한 경우 도메인, 유효기간 등을 설정
         response.addCookie(refreshTokenCookie);
-
+        new ObjectMapper().writeValue(response.getWriter(),token);
 
     }
 
