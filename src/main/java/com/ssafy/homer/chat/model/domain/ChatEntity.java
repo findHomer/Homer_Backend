@@ -15,13 +15,13 @@ import java.sql.Timestamp;
 @Builder
 public class ChatEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long chatId;
+    Long chatId;
 
     @Column
-    long chatroomId;
+    Long chatroomId;
 
     @Column
-    long userId;
+    Long userId;
 
     @Column(columnDefinition = "text")
     String contents;

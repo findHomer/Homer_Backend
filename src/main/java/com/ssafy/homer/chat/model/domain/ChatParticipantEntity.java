@@ -14,11 +14,11 @@ import javax.persistence.*;
 public class ChatParticipantEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long chatParticipantId;
+    Long chatParticipantId;
 
     @Column
-    long user_id;
+    Long user_id;
 
     @Column
-    long chatroom_id;
+    Long chatroom_id;
 }
