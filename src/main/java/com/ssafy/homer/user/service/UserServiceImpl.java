@@ -16,6 +16,8 @@ import com.ssafy.homer.user.dto.SignupDto;
 import com.ssafy.homer.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService{
@@ -75,6 +77,11 @@ public class UserServiceImpl implements UserService{
 			return jwtUtil.createAccessToken(user);
 		}
 		return null;
+	}
+
+	@Override
+	public void addProfile(MultipartFile multipartFile) {
+
 	}
 
 }

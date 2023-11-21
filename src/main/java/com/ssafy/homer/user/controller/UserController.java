@@ -10,6 +10,7 @@ import com.ssafy.homer.user.dto.SignupDto;
 import com.ssafy.homer.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -39,12 +40,12 @@ public class UserController {
 	}
 	
 	/**
-	 * 프로필 추가하는 부분
+	 * 프로필 사진추가하는 부분
 	 * @return
 	 */
-	@PostMapping("/profiles")
-	public ResponseEntity addProfile() {
-		//userService.addProfile()
+	@PatchMapping("/profiles")
+	public ResponseEntity addProfile(@RequestPart(value = "image", required = false) MultipartFile multipartFile) {
+		userService.addProfile(multipartFile);
 		return ResponseEntity.ok().build();
 	}
 
@@ -55,6 +56,8 @@ public class UserController {
 
 		return ResponseEntity.ok().body(accessToken);
 	}
+
+
 	@GetMapping("/ping")
 	public ResponseEntity pong() {
 		return ResponseEntity.ok("pong");
