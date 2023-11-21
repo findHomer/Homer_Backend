@@ -1,13 +1,12 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '2.7.17'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+    id 'org.springframework.boot' version '2.7.17'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10' // QueryDSL 플러그인
 }
 
-apply plugin : 'io.spring.dependency-management'
 group = 'com.ssafy'
 version = '0.0.1-SNAPSHOT'
-
 java {
 	sourceCompatibility = '1.8'
 }
@@ -19,13 +18,18 @@ configurations {
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+}
+
+ext {
+    queryDslVersion = '5.0.0' // QueryDSL 버전
 }
 
 dependencies {
-	//implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	//implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	compileOnly 'org.projectlombok:lombok'
@@ -33,10 +37,22 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	//testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation "io.jsonwebtoken:jjwt-api:0.11.5"
+	runtimeOnly "io.jsonwebtoken:jjwt-impl:0.11.5"
+	implementation "io.jsonwebtoken:jjwt-jackson:0.11.5"
+    //test 관련 의존성 설정
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testCompileOnly  'org.projectlombok:lombok'
+    testAnnotationProcessor  'org.projectlombok:lombok'
 
-	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
-	implementation 'org.webjars.bower:bootstrap:4.3.1'
+    // QueryDSL 관련 의존성
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation 'org.webjars.bower:bootstrap:4.3.1'
     implementation 'org.webjars.bower:vue:2.5.16'
     implementation 'org.webjars.bower:axios:0.17.1'
     implementation 'org.webjars:sockjs-client:1.1.2'
@@ -45,6 +61,29 @@ dependencies {
 	// https://mvnrepository.com/artifact/it.ozimov/embedded-redis
 	implementation 'it.ozimov:embedded-redis:0.7.2'
 
+}
+
+// QueryDSL 소스 디렉토리 설정
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+    main.java.srcDir querydslDir
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+}
+
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
 }
 
 tasks.named('test') {
