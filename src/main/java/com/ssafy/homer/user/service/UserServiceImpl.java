@@ -69,7 +69,8 @@ public class UserServiceImpl implements UserService{
 	public String refresh(String refreshToken) {
 		String email = jwtUtil.getEmail(refreshToken);
 		RefreshTokenDto realRefreshToken = redisRepository.findById(email).orElseThrow(null);
-		if(refreshToken.equals(realRefreshToken)){
+
+		if(refreshToken.equals(realRefreshToken.getToken())){
 			User user = userRepository.findByEmail(email).orElseThrow(null);
 			return jwtUtil.createAccessToken(user);
 		}

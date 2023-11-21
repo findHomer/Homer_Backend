@@ -27,6 +27,7 @@ public class UserController {
 	
 	@PostMapping("/logout")
 	public ResponseEntity logout() {
+		System.out.println("logoug");
 		userService.logout();
 		return ResponseEntity.ok().build();
 	}
@@ -47,7 +48,7 @@ public class UserController {
 		return ResponseEntity.ok().build();
 	}
 
-	@PostMapping("/slient-refresh")
+	@PostMapping("/silent-refresh")
 	public ResponseEntity refresh(@CookieValue String refreshToken){
 
 		String accessToken = userService.refresh(refreshToken);
