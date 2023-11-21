@@ -33,6 +33,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -56,8 +58,8 @@ public class SecurityConfig{
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOriginPatterns(List.of("*"));
-                config.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedOriginPatterns(Arrays.asList("*"));
+                config.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS"));
                 config.setAllowCredentials(true);
                 config.setAllowedHeaders(Collections.singletonList("*"));
                 config.setMaxAge(3600L); //1시간

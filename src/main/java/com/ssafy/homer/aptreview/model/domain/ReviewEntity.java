@@ -7,8 +7,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.DynamicInsert;
+import com.ssafy.homer.user.domain.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,8 +34,9 @@ public class ReviewEntity  {
 	@Column
 	private String aptId;
 
-	@Column
-	private Long userId;
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 
 	@Column
 	private String contents;
@@ -47,8 +52,8 @@ public class ReviewEntity  {
 
 	@Override
 	public String toString() {
-		return "ReviewEntity [reviewId=" + reviewId + ", aptId=" + aptId + ", userId=" + userId + ", contents="
-				+ contents + ", photoUrl=" + photoUrl + ", starScore=" + starScore + ", createdAt=" + createdAt + "]";
+		return "ReviewEntity [reviewId=" + reviewId + ", aptId=" + aptId + ", user=" + user + ", contents=" + contents
+				+ ", photoUrl=" + photoUrl + ", starScore=" + starScore + ", createdAt=" + createdAt + "]";
 	}
 	
 	
