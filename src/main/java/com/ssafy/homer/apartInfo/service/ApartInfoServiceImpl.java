@@ -7,8 +7,8 @@ import java.util.*;
 import com.ssafy.homer.apartInfo.domain.ApartDeal;
 import com.ssafy.homer.apartInfo.domain.ApartInfo;
 import com.ssafy.homer.apartInfo.dto.*;
-import com.ssafy.homer.apartInfo.exception.BaseException;
-import com.ssafy.homer.apartInfo.exception.ErrorCode;
+import com.ssafy.homer.exception.BaseException;
+import com.ssafy.homer.exception.ErrorCode;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.homer.apartInfo.repository.ApartInfoRepository;
