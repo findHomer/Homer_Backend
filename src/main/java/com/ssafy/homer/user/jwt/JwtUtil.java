@@ -93,6 +93,20 @@ public class JwtUtil {
 
 	}
 
+	public Claims verifyRefreshToken(String accessToken) {
+		try{
+			return Jwts.parserBuilder()
+					.setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+					.build()
+					.parseClaimsJws(accessToken)
+					.getBody();
+		//임시
+		} catch (Exception e) {
+			throw new BaseException(ErrorCode.REFRESHTOKEN_ERROR);
+		}
+
+
+	}
 	public String getEmail(String token) {
 		try{
 			return Jwts.parserBuilder()
