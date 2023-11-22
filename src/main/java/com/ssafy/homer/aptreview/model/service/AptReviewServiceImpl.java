@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.ssafy.homer.aptreview.model.domain.ReviewEntity;
 import com.ssafy.homer.aptreview.model.dto.ReviewDto;
 import com.ssafy.homer.aptreview.model.repository.AptReviewRepository;
+import com.ssafy.homer.user.domain.User;
+import com.ssafy.homer.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,12 +19,16 @@ import lombok.RequiredArgsConstructor;
 public class AptReviewServiceImpl implements AptReviewService{
 	
 	private final AptReviewRepository aptReviewRepository;
+	private final UserRepository userRepository;
 	
 	@Override
 	public boolean registerReview(ReviewDto review) {
+		
+		Optional<User> user = userRepository.findByEmail(review.getEmail());
+		
 		ReviewEntity entity = ReviewEntity.builder()
 			   .aptId(review.getAptId())
-			   .userId(review.getUserId())
+			   .user(user.get())
 			   .contents(review.getContents())
 			   .photoUrl(review.getPhotoUrl())
 			   .starScore(review.getStarScore())
@@ -34,33 +40,22 @@ public class AptReviewServiceImpl implements AptReviewService{
 
 	@Override
 	public List<ReviewDto> allReview(String aptId) {
-//		List<ReviewDto> results = new ArrayList<ReviewDto>();
-		
+
 		List<ReviewEntity> entities = aptReviewRepository.findByAptId(aptId);
 		List<ReviewDto> results = entities.stream()
 				.map(m -> ReviewDto.builder()
 						.reviewId(m.getReviewId())
 						.aptId(m.getAptId())
 						.contents(m.getContents())
-						.userId(m.getUserId())
+						.userId(m.getUser().getUserId())
+						.nickname(m.getUser().getNickname())
+						.profileUrl(m.getUser().getUserPhoto())
+						.email(m.getUser().getEmail())
 						.photoUrl(m.getPhotoUrl())
 						.starScore(m.getStarScore())
 						.createdAt(m.getCreatedAt())
 						.build())
  				.collect(Collectors.toList());
-//		
-//		for(ReviewEntity entity: entities) {
-//			ReviewDto dto = ReviewDto.builder()
-//					.aptId(entity.getAptId())
-//					.contents(entity.getContents())
-//					.userId(entity.getUserId())
-//					.photoUrl(entity.getPhotoUrl())
-//					.starScore(entity.getStarScore())
-//					.createdAt(entity.getCreatedAt())
-//					.build();
-//			results.add(dto);
-//		}
-		
 		return results;
 	}
 
