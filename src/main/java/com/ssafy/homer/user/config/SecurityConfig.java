@@ -5,6 +5,7 @@ import com.ssafy.homer.user.filter.JwtAuthenticationFilter;
 import com.ssafy.homer.user.filter.JwtAuthorizationFilter;
 import com.ssafy.homer.user.jwt.JwtUtil;
 import com.ssafy.homer.user.repository.UserRepository;
+import com.ssafy.homer.user.service.RedisService;
 import com.ssafy.homer.user.service.UserDetailServiceImpl;
 
 import java.util.Arrays;
@@ -33,13 +34,15 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig{
-	
+	private final RedisService redisService;
 	private final JwtUtil jwtUtil;
 	
     /**
@@ -57,7 +60,8 @@ public class SecurityConfig{
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration config = new CorsConfiguration();
                 config.setAllowedOriginPatterns(Arrays.asList("*"));
-                config.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS"));
+
+                config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 config.setAllowCredentials(true);
                 config.setAllowedHeaders(Collections.singletonList("*"));
                 config.setMaxAge(3600L); //1시간
@@ -75,8 +79,8 @@ public class SecurityConfig{
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
                         // /api 시작하는 URL에 대한 접근 제어
-                		.antMatchers("/api/v1/users/ping","/api/v1/login","/api/v1/users/signup").permitAll()
-                        .antMatchers("/api/v1/users/**").hasAnyRole("USER", "ADMIN")
+                		.antMatchers("/api/v1/users/ping","/api/v1/login","/api/v1/users/signup","/api/v1/users/silent-refresh").permitAll()
+                        .antMatchers("/api/v1/users/**","/api/v1/bookmarks/**").hasAnyRole("USER", "ADMIN")
                         // /admin 시작하는 URL에 대한 접근 제어
                         .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         // 나머지 URL에 대한 접근 허용
@@ -108,7 +112,7 @@ public class SecurityConfig{
 			AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
 			http
 					
-				.addFilterAt(new JwtAuthenticationFilter(authenticationManager,jwtUtil), UsernamePasswordAuthenticationFilter.class)//usernamePasswordAuthenticationFilter위치에 커스텀한 인증필터 대체
+				.addFilterAt(new JwtAuthenticationFilter(redisService,authenticationManager,jwtUtil), UsernamePasswordAuthenticationFilter.class)//usernamePasswordAuthenticationFilter위치에 커스텀한 인증필터 대체
 				.addFilterAfter(new JwtAuthorizationFilter(jwtUtil), JwtAuthenticationFilter.class);
             }
 	}
