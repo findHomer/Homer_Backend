@@ -56,7 +56,9 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public void logout() {
 		//redis refresh토큰 삭제
-		
+		String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+		redisRepository.deleteById(email);
+
 	}
 
 	@Override
