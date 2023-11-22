@@ -39,7 +39,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter{
         String accessToken = request.getHeader("AUTHORIZATION");
 
         System.out.println(accessToken);
-        String[] notPermitList= {"/api/v1/users/logout", "/api/v1/boomarks", "/api/v1/users/mypage", "/api/v1/users/admin"};
+        String[] notPermitList= {"/api/v1/users/logout", "/api/v1/bookmarks", "/api/v1/users/mypage", "/api/v1/users/admin"};
         boolean nonpass=true;
 
         for(String url:notPermitList){

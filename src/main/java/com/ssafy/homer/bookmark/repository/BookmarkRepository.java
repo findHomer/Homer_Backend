@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark,Long> {
-
+    Optional<Bookmark> findByUserUserIdAndApartInfoAptId(Long userId,String aptId);
 }
