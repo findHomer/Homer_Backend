@@ -45,6 +45,7 @@ dependencies {
     testCompileOnly  'org.projectlombok:lombok'
     testAnnotationProcessor  'org.projectlombok:lombok'
 
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
     // QueryDSL 관련 의존성
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"

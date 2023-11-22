@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
+import com.ssafy.homer.apartInfo.dto.MapLocationDto;
 import com.ssafy.homer.apartInfo.dto.SearchMapDto;
 import com.ssafy.homer.apartInfo.service.ApartInfoService;
 
@@ -52,6 +53,12 @@ public class ApartInfoController {
 		ApartInfoDetailDto apartInfoDetailDto =  apartInfoService.findApartDetail(aptId);
 
 		return ResponseEntity.ok().body(apartInfoDetailDto);
+	}
+	
+	@GetMapping("/locations/dong")
+	public ResponseEntity mapLocation(@RequestParam String dongCode) {
+		MapLocationDto location = apartInfoService.findDongLocation(dongCode);
+		return ResponseEntity.ok().body(location);
 	}
 	
 	

@@ -106,6 +106,16 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 		return apartInfoDetailDto;
 	}
 
+	@Override
+	public MapLocationDto findDongLocation(String entireCode) {
+		ApartInfo apart = apartInfoRepository.findFirstByEntireCodeStartingWith(entireCode).orElse(
+				apartInfoRepository.findFirstByEntireCodeStartingWith(entireCode.substring(0,entireCode.length()-4)).orElseThrow(null));
+		return MapLocationDto.builder()
+				.lat(apart.getLat())
+				.lng(apart.getLng())
+				.build();
+	}
+
 
 
 }
