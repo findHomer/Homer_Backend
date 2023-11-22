@@ -31,11 +31,13 @@ public class AptReviewController {
 	private final S3Uploader s3uploader;
 	
 	@PostMapping
-	public ResponseEntity<?> register(@RequestPart("review") ReviewDto review, @RequestPart(value="image") MultipartFile image){
+	public ResponseEntity<?> register(@RequestPart(value = "review") ReviewDto review, @RequestPart(value="image", required = false) MultipartFile image){
 		String url = null;
 		try {
-			url = s3uploader.upload(image, "review");
-			review.setPhotoUrl(url);
+			if(image != null){
+				url = s3uploader.upload(image, "review");
+				review.setPhotoUrl(url);
+			}
 		}catch(Exception e) {
 			return ResponseEntity.badRequest().build();
 		}
