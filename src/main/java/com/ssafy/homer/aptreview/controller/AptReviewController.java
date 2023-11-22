@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.homer.aptreview.model.dto.ReviewDto;
 import com.ssafy.homer.aptreview.model.service.AptReviewService;
+import com.ssafy.homer.s3.util.S3Uploader;
 
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,9 +28,18 @@ import lombok.extern.slf4j.Slf4j;
 public class AptReviewController {
 	
 	private final AptReviewService aptReviewService;
+	private final S3Uploader s3uploader;
 	
 	@PostMapping
-	public ResponseEntity<?> register(@RequestBody ReviewDto review){
+	public ResponseEntity<?> register(@RequestPart("review") ReviewDto review, @RequestPart(value="image") MultipartFile image){
+		String url = null;
+		try {
+			url = s3uploader.upload(image, "review");
+			review.setPhotoUrl(url);
+		}catch(Exception e) {
+			return ResponseEntity.badRequest().build();
+		}
+		
 		boolean result = aptReviewService.registerReview(review);
 		return ResponseEntity.ok(result);
 	}
