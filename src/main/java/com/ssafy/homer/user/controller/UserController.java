@@ -2,6 +2,11 @@ package com.ssafy.homer.user.controller;
 
 import com.ssafy.homer.user.dto.MyPageDto;
 import com.ssafy.homer.user.jwt.JwtUtil;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +32,13 @@ public class UserController {
 	}
 	
 	@PostMapping("/logout")
-	public ResponseEntity logout() {
-		System.out.println("logoug");
+	public ResponseEntity logout(HttpServletRequest request,HttpServletResponse response) {
+		Cookie[] getCookie = request.getCookies();
+		for(Cookie cookie : getCookie) {
+			System.out.println(cookie.getName());
+			cookie.setMaxAge(0);
+			response.addCookie(cookie);
+		}
 		userService.logout();
 		return ResponseEntity.ok().build();
 	}

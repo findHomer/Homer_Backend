@@ -1,8 +1,8 @@
 package com.ssafy.homer.apartInfo.repository;
 
 import java.util.List;
+import java.util.Optional;
 
-import org.apache.el.stream.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -28,4 +28,6 @@ public interface ApartInfoRepository extends JpaRepository<ApartInfo,String>,Apa
 	List<ApartInfoDto> searchMap(SearchMapDto searchMapDto);
 
 	List<ApartInfoDto> searchName(SearchNameDto searchNameDto);
+	
+	Optional<ApartInfo> findFirstByEntireCodeStartingWith(String entireCode);
 }
