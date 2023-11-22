@@ -61,7 +61,7 @@ public class UserController {
 
 	@PostMapping("/silent-refresh")
 	public ResponseEntity refresh(@CookieValue String refreshToken){
-
+		System.out.println(refreshToken);
 		String accessToken = userService.refresh(refreshToken);
 
 		return ResponseEntity.ok().body(accessToken);

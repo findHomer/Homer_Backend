@@ -39,7 +39,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter{
             System.out.println(authorizationHeader);
             // Access Token만 꺼내옴
             String accessToken = null;
-            if (StringUtils.hasText(authorizationHeader))
+            if (StringUtils.hasText(authorizationHeader)&&authorizationHeader.length()>="Bearer ".length())
                 accessToken = authorizationHeader.substring("Bearer ".length());
             else{//permitall 통과
                 SecurityContextHolder.getContext().setAuthentication(null);
