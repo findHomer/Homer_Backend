@@ -18,3 +18,16 @@ spring:
   redis:
    port: 6379
    host: 13.125.19.18
+   
+   
+cloud:
+  aws:
+    credentials:
+      accessKey: *
+      secretKey: *
+    s3:
+      bucket: chatzipt
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
