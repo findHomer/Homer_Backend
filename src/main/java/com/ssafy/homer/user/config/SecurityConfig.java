@@ -61,7 +61,7 @@ public class SecurityConfig{
                 CorsConfiguration config = new CorsConfiguration();
                 config.setAllowedOriginPatterns(Arrays.asList("*"));
 
-                config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                 config.setAllowCredentials(true);
                 config.setAllowedHeaders(Collections.singletonList("*"));
                 config.setMaxAge(3600L); //1시간
