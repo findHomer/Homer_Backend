@@ -59,7 +59,7 @@ public class SecurityConfig{
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration config = new CorsConfiguration();
                 config.setAllowedOriginPatterns(Arrays.asList("*"));
-                config.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
                 config.setAllowCredentials(true);
                 config.setAllowedHeaders(Collections.singletonList("*"));
                 config.setMaxAge(3600L); //1시간
@@ -77,7 +77,7 @@ public class SecurityConfig{
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
                         // /api 시작하는 URL에 대한 접근 제어
-                		.antMatchers("/api/v1/users/ping","/api/v1/login","/api/v1/users/signup").permitAll()
+                		.antMatchers("/api/v1/users/ping","/api/v1/login","/api/v1/users/signup","/api/v1/users/silent-refresh").permitAll()
                         .antMatchers("/api/v1/users/**","/api/v1/bookmarks/**").hasAnyRole("USER", "ADMIN")
                         // /admin 시작하는 URL에 대한 접근 제어
                         .antMatchers("/api/v1/admin/**").hasRole("ADMIN")

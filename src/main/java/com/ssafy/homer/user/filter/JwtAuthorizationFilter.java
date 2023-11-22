@@ -36,7 +36,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter{
         // header 에서 JWT token을 가져옵니다.
         String authorizationHeader = request.getHeader("AUTHORIZATION");
 
-        
+            System.out.println(authorizationHeader);
             // Access Token만 꺼내옴
             String accessToken = null;
             if (StringUtils.hasText(authorizationHeader))

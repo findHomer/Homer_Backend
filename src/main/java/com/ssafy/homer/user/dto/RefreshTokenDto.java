@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.RedisHash;
 @Builder
 @Getter
 @AllArgsConstructor
-@RedisHash(value="refreshToken",timeToLive=60*60*24*30)//30일 기간
+@RedisHash(timeToLive=60*60*24*30)//30일 기간
 public class RefreshTokenDto {
 
     @Id
