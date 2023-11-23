@@ -1,17 +1,20 @@
 package com.ssafy.homer.chat.model.dto;
 
-import java.io.Serializable;
-
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ChatMessage implements Serializable{
+@Builder
+public class ChatMessage{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+//	private static final long serialVersionUID = -1445846086349013883L;
+	/**
+	 * 
+	 */
 	
 	public enum MessageType{
 		ENTER, TALK
@@ -20,5 +23,6 @@ public class ChatMessage implements Serializable{
 	private MessageType type;
 	private String roomId;
 	private String sender;
+	private String profileUrl;
 	private String message;
 }

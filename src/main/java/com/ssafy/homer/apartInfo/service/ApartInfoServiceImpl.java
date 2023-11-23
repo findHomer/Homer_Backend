@@ -7,19 +7,26 @@ import java.util.*;
 import com.ssafy.homer.apartInfo.domain.ApartDeal;
 import com.ssafy.homer.apartInfo.domain.ApartInfo;
 import com.ssafy.homer.apartInfo.dto.*;
+import com.ssafy.homer.bookmark.domain.Bookmark;
 import com.ssafy.homer.exception.BaseException;
 import com.ssafy.homer.exception.ErrorCode;
+import com.ssafy.homer.user.domain.MyUserDetail;
+import com.ssafy.homer.user.domain.User;
+import com.ssafy.homer.user.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.homer.apartInfo.repository.ApartInfoRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
 public class ApartInfoServiceImpl implements ApartInfoService{
 	
 	private final ApartInfoRepository apartInfoRepository;
+	private final UserRepository userRepository;
 	@Override
 	public List<ApartInfoDto> findTotalApart() {
 		return apartInfoRepository.findSimpleAll();
@@ -40,6 +47,15 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 	@Override
 	public ApartInfoDetailDto findApartDetail(String apartId) {
 		 ApartInfo apartInfo =  apartInfoRepository.findById(apartId).orElseThrow(() -> new BaseException(ErrorCode.APART_NOT_FOUND));
+
+		 Boolean mark=false;
+		 //userId로 토큰 저장값 바꾸기
+
+		List<String> emails = new ArrayList<>();
+
+		for(Bookmark bookmark: apartInfo.getBookmarkList()) {
+			emails.add(bookmark.getUser().getEmail());
+		}
 
 		 List<ApartDealAreaDto> apartDealAreaDtoList = new ArrayList<ApartDealAreaDto>();
 
@@ -100,6 +116,7 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 				 .lat(apartInfo.getLat())
 				 .lng(apartInfo.getLng())
 				 .householdCount(apartInfo.getHouseholdCount())
+				 .emails(emails)
 				 .dealInfos(apartDealAreaDtoList)
 				 .build();
 
