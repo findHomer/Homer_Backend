@@ -1,22 +1,24 @@
 package com.ssafy.homer.bookmark.service;
 
-import com.ssafy.homer.apartInfo.domain.ApartInfo;
-import com.ssafy.homer.apartInfo.repository.ApartInfoRepository;
-import com.ssafy.homer.apartInfo.service.ApartInfoService;
-import com.ssafy.homer.bookmark.domain.Bookmark;
-import com.ssafy.homer.bookmark.dto.BookmarkDelDto;
-import com.ssafy.homer.bookmark.dto.BookmarkDto;
-import com.ssafy.homer.bookmark.repository.BookmarkRepository;
-import com.ssafy.homer.user.domain.User;
-import com.ssafy.homer.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.transaction.Transactional;
-import java.security.Security;
-import java.util.List;
+import com.ssafy.homer.apartInfo.domain.ApartInfo;
+import com.ssafy.homer.apartInfo.repository.ApartInfoRepository;
+import com.ssafy.homer.bookmark.domain.Bookmark;
+import com.ssafy.homer.bookmark.dto.BookmarkDto;
+import com.ssafy.homer.bookmark.dto.MyApartInfoDto;
+import com.ssafy.homer.bookmark.repository.BookmarkRepository;
+import com.ssafy.homer.user.domain.User;
+import com.ssafy.homer.user.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -59,10 +61,24 @@ public class BookmarkServiceImpl implements BookmarkService{
     }
 
     @Override
-    public List<Bookmark> getBookmark() {
+    public List<MyApartInfoDto> getBookmark() {
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         User user = userRepository.findByEmail(email).orElseThrow(null);
-
-        return user.getBookmarkList();
+        List<MyApartInfoDto> aptList = new ArrayList<>();
+        List<Bookmark> bookmarkList = user.getBookmarkList();
+        
+        for(Bookmark bookmark:bookmarkList) {
+        	ApartInfo apt = bookmark.getApartInfo();
+        	//aptList에 추가
+        	aptList.add(MyApartInfoDto.builder()
+        	.aptId(apt.getAptId())
+        	.aptName(apt.getAptName())
+        	.lat(apt.getLat())
+        	.lng(apt.getLng())
+        	.roadAddr(apt.getRoadAddr())
+        	.build());
+        }
+        
+        return aptList;
     }
 }

@@ -2,7 +2,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://43.201.45.143:3306/homerDB?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://15.165.18.66:3306/homerDB?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
     password: ssafy
 
@@ -17,14 +17,14 @@ spring:
       #show-sql: true
   redis:
    port: 6379
-   host: 43.201.45.143
+   host: 15.165.18.66
    
    
 cloud:
   aws:
     credentials:
-      accessKey: *
-      secretKey: *
+      accessKey: AKIA3RPMVVCHL7EJI6PW
+      secretKey: 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
     s3:
       bucket: chatzipt
     region:

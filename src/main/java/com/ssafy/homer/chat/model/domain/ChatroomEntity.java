@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 @Entity(name = "chatroom")
 public class ChatroomEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long chatroomId;
+    String chatroomId;
 
     @Column
     String chatroomName;

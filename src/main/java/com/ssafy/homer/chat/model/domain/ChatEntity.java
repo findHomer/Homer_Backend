@@ -18,7 +18,7 @@ public class ChatEntity {
     Long chatId;
 
     @Column
-    Long chatroomId;
+    String chatroomId;
 
     @Column
     Long userId;
