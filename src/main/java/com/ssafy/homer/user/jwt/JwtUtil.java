@@ -2,6 +2,8 @@ package com.ssafy.homer.user.jwt;
 
 import java.util.Date;
 
+import com.ssafy.homer.exception.BaseException;
+import com.ssafy.homer.exception.ErrorCode;
 import org.springframework.stereotype.Component;
 
 import com.ssafy.homer.user.domain.User;
@@ -68,24 +70,43 @@ public class JwtUtil {
 		
 		} catch (SecurityException e) {
 	        log.info("Invalid JWT signature.");
+			throw new BaseException(ErrorCode.UNAUTHORIZED);
 	        //throw new CustomJwtRuntimeException();
 	    } catch (MalformedJwtException e) {
 	        log.info("Invalid JWT token.");
+			throw new BaseException(ErrorCode.UNAUTHORIZED);
 	        //throw new CustomJwtRuntimeException();
 	    } catch (ExpiredJwtException e) {
 	        log.info("Expired JWT token.");
+			throw new BaseException(ErrorCode.UNAUTHORIZED);
 	       // throw new CustomJwtRuntimeException();
 	    } catch (UnsupportedJwtException e) {
 	        log.info("Unsupported JWT token.");
+			throw new BaseException(ErrorCode.UNAUTHORIZED);
 	        //throw new CustomJwtRuntimeException();
 	    } catch (IllegalArgumentException e) {
 	        log.info("JWT token compact of handler are invalid.");
+			throw new BaseException(ErrorCode.UNAUTHORIZED);
 	       // throw new CustomJwtRuntimeException();
 	    }
 		
-		return null;
+
 	}
 
+	public Claims verifyRefreshToken(String accessToken) {
+		try{
+			return Jwts.parserBuilder()
+					.setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+					.build()
+					.parseClaimsJws(accessToken)
+					.getBody();
+		//임시
+		} catch (Exception e) {
+			throw new BaseException(ErrorCode.REFRESHTOKEN_ERROR);
+		}
+
+
+	}
 	public String getEmail(String token) {
 		try{
 			return Jwts.parserBuilder()

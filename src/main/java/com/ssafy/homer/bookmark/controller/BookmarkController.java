@@ -20,8 +20,8 @@ public class BookmarkController {
     }
 
     @DeleteMapping()
-    ResponseEntity deleteBookmark(@RequestBody BookmarkDelDto bookmarkDelDto){
-        bookmarkService.deleteBookmark(bookmarkDelDto);
+    ResponseEntity deleteBookmark(String aptId){
+        bookmarkService.deleteBookmark(aptId);
         return ResponseEntity.ok().build();
     }
 

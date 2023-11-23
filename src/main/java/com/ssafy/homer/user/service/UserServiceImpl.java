@@ -56,7 +56,9 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public void logout() {
 		//redis refresh토큰 삭제
-		
+		String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+		redisRepository.deleteById(email);
+
 	}
 
 	@Override
@@ -76,7 +78,10 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public String refresh(String refreshToken) {
 		String email = jwtUtil.getEmail(refreshToken);
+		System.out.println(email);
 		RefreshTokenDto realRefreshToken = redisRepository.findById(email).orElseThrow(null);
+		System.out.println(realRefreshToken.getToken());
+
 		if(refreshToken.equals(realRefreshToken.getToken())){
 			User user = userRepository.findByEmail(email).orElseThrow(null);
 			return jwtUtil.createAccessToken(user);

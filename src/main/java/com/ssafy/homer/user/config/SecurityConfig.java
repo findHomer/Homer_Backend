@@ -85,15 +85,6 @@ public class SecurityConfig{
                         // 나머지 URL에 대한 접근 허용
                         .anyRequest().permitAll()
                     );
-                //.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
-                /*.exceptionHandling((exceptions) -> exceptions
-                        .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
-                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
-
-
-                )*/
-                //경로 설정
-                //필터 로직 설정 필요
         return http.build();
     }
 

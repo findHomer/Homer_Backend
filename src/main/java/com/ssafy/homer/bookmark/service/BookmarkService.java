@@ -5,7 +5,7 @@ import com.ssafy.homer.bookmark.dto.BookmarkDelDto;
 import com.ssafy.homer.bookmark.dto.BookmarkDto;
 import java.util.List;
 public interface BookmarkService {
-	public void deleteBookmark(BookmarkDelDto bookmarkDelDto);
+	public void deleteBookmark(String aptId);
 	
 	public void addBookmark(BookmarkDto bookmarkDto);
 

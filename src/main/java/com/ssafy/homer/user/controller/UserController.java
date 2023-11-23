@@ -32,13 +32,12 @@ public class UserController {
 	}
 	
 	@PostMapping("/logout")
-	public ResponseEntity logout(HttpServletRequest request,HttpServletResponse response) {
-		Cookie[] getCookie = request.getCookies();
-		for(Cookie cookie : getCookie) {
-			System.out.println(cookie.getName());
-			cookie.setMaxAge(0);
-			response.addCookie(cookie);
-		}
+	public ResponseEntity logout(HttpServletResponse response) {
+		Cookie cookie = new Cookie("refreshToken",null);
+		cookie.setPath("/"); // 쿠키 경로 설정
+		cookie.setHttpOnly(true);
+		cookie.setMaxAge(0); // 쿠키를 즉시 만료시킵니다.
+		response.addCookie(cookie);
 		userService.logout();
 		return ResponseEntity.ok().build();
 	}

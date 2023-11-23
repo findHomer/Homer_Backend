@@ -39,7 +39,7 @@ public class ApartInfoDetailDto {
 	private Double lng;
 	
 	private Float parkPerHouse;
-	
 
+	private List<String> emails;
 	private List<ApartDealAreaDto> dealInfos;
 }

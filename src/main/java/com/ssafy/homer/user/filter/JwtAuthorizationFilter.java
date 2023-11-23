@@ -1,6 +1,7 @@
 package com.ssafy.homer.user.filter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -9,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ssafy.homer.exception.BaseException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,40 +34,63 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter{
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		String servletPath = request.getServletPath();
+        String servletPath = request.getServletPath();
         // header 에서 JWT token을 가져옵니다.
-        String authorizationHeader = request.getHeader("AUTHORIZATION");
+        String accessToken = request.getHeader("AUTHORIZATION");
 
-            System.out.println(authorizationHeader);
-            // Access Token만 꺼내옴
-            String accessToken = null;
-            if (StringUtils.hasText(authorizationHeader))
-                accessToken = authorizationHeader.substring("Bearer ".length());
-            else{//permitall 통과
-                SecurityContextHolder.getContext().setAuthentication(null);
-                filterChain.doFilter(request, response);
-                return;
+        System.out.println(accessToken);
+        String[] notPermitList= {"/api/v1/users/logout", "/api/v1/bookmarks", "/api/v1/users/mypage", "/api/v1/users/admin", "/api/v1/users/profiles"};
+        boolean nonpass=true;
+
+        for(String url:notPermitList){
+            if(servletPath.startsWith(url)) {
+                nonpass = false;
+                break;
             }
-            // === Access Token 검증 === //
+        }
 
-            Claims jwtClaim = jwtUtil.verifyAccessToken(accessToken);
-            //권한 claim에 추가해 db 호출 줄일 수 있음(개선필요)
-            String email = jwtClaim.getSubject();
-            String authority = jwtClaim.get("roles",String.class);
-            System.out.println(authority);
-            //User user = userRepository.findByEmail(email).orElseThrow(()-> new RuntimeException());
-           // MyUserDetail userDetails = new MyUserDetail(user);
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-
-            for(String role : authority.split(",")){
-                authorities.add(new SimpleGrantedAuthority(role));
-            }
-            //user를 securityContext에 principal로 등록
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, null, authorities);//authority
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
+        //permitAll 처리
+        if (nonpass){
+            SecurityContextHolder.getContext().setAuthentication(null);
             filterChain.doFilter(request, response);
-        
+            return;
+            }
+            if(accessToken.length()>"Bearer".length())
+                accessToken = accessToken.substring("Bearer ".length());
+            try {
+                // === Access Token 검증 === //
+
+                Claims jwtClaim = jwtUtil.verifyAccessToken(accessToken);
+
+                //권한 claim에 추가해 db 호출 줄일 수 있음(개선필요)
+                String email = jwtClaim.getSubject();
+                String authority = jwtClaim.get("roles", String.class);
+
+                Collection<GrantedAuthority> authorities = new ArrayList<>();
+
+                for (String role : authority.split(",")) {
+                    authorities.add(new SimpleGrantedAuthority(role));
+                }
+                //user를 securityContext에 principal로 등록
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, null, authorities);//authority
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                filterChain.doFilter(request, response);
+            }catch (BaseException e){
+                // 예외에 대한 응답 코드 및 메시지 설정
+                int statusCode = e.getErrorCode().getErrorCode();
+                String errorMessage = e.getErrorCode().getErrorMsg();
+
+                // HTTP 응답 설정
+                response.setStatus(statusCode);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+
+                // 응답 본문에 오류 메시지 작성
+                try (PrintWriter writer = response.getWriter()) {
+                    writer.write("{\"error\": \"" + errorMessage + "\"}");
+                }
+        }
 
     }
 		

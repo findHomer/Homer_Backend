@@ -1,4 +1,4 @@
-package com.ssafy.homer.apartInfo.exception;
+package com.ssafy.homer.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
