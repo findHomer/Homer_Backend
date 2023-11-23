@@ -8,7 +8,10 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import com.ssafy.homer.chat.model.dto.ChatMessage;
 
 @Configuration
 @EnableRedisRepositories
@@ -44,6 +47,7 @@ public class RedisConfig {
 	        RedisTemplate<byte[], byte[]> redisTemplate = new RedisTemplate<>();
 	        redisTemplate.setConnectionFactory(redisConnectionFactory());
 	        redisTemplate.setKeySerializer(new StringRedisSerializer());
+	        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(ChatMessage.class));
 	        return redisTemplate;
 	    }
 }
