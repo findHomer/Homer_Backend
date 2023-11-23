@@ -77,6 +77,7 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public String refresh(String refreshToken) {
+		jwtUtil.verifyRefreshToken(refreshToken);
 		String email = jwtUtil.getEmail(refreshToken);
 		System.out.println(email);
 		RefreshTokenDto realRefreshToken = redisRepository.findById(email).orElseThrow(null);

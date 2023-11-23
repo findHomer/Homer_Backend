@@ -24,6 +24,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ChatroomEntity {
+    
     @Id
     String chatroomId;
 

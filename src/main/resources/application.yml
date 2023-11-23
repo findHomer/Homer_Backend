@@ -23,8 +23,8 @@ spring:
 cloud:
   aws:
     credentials:
-      accessKey: *
-      secretKey: *
+      accessKey: AKIA3RPMVVCHL7EJI6PW
+      secretKey: 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
     s3:
       bucket: chatzipt
     region:

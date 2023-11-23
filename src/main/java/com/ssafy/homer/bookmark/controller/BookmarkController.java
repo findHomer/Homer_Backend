@@ -3,6 +3,7 @@ package com.ssafy.homer.bookmark.controller;
 import com.ssafy.homer.bookmark.domain.Bookmark;
 import com.ssafy.homer.bookmark.dto.BookmarkDelDto;
 import com.ssafy.homer.bookmark.dto.BookmarkDto;
+import com.ssafy.homer.bookmark.dto.MyApartInfoDto;
 import com.ssafy.homer.bookmark.service.BookmarkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class BookmarkController {
 
     @GetMapping()
     ResponseEntity getBookmark(){
-        List<Bookmark> bookmarkList = bookmarkService.getBookmark();
-        return ResponseEntity.ok().body(bookmarkList);
+        List<MyApartInfoDto> aptList = bookmarkService.getBookmark();
+        return ResponseEntity.ok().body(aptList);
     }
 }
