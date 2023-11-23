@@ -2,6 +2,7 @@ package com.ssafy.homer.chat.model.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,8 @@ public class ChatServiceImpl implements ChatService {
 		ChatRoom chatroom = chatroomRedisRepository.createChatRoom(name);
 
 		// 해당 내용 그대로 mysql에 저장
-		ChatroomEntity entity = ChatroomEntity.builder().chatroomId(chatroom.getRoomId())
+		ChatroomEntity entity = ChatroomEntity.builder()
+				.chatroomId(chatroom.getRoomId())
 				.chatroomName(chatroom.getName()).build();
 
 		chatroomRepository.save(entity);
@@ -132,9 +134,23 @@ public class ChatServiceImpl implements ChatService {
 		}
 
 		// 없으면 mysql에서 가지고 오기
-
+		for(ChatEntity entity : chatRepository.findByChatroomId(chatroomId)) {
+			Optional<User> user = userRepository.findByUserId(entity.getUserId().intValue());
+			
+			//모든 데이터 챗으로 저장하기
+			chatRedisRepository.sendChat(chatroomId, ChatMessage.builder()
+					.roomId(chatroomId)
+					.message(entity.getContents())
+					.profileUrl(user.orElse(User.builder().userPhoto("").build()).getUserPhoto())
+					.sender(user.orElse(User.builder().nickname("Guest").build()).getNickname())
+					.build()
+					);
+		}
+		
 		return msgs;
 	}
+		
+	
 
 	@Override
 	public boolean deleteChat(Long chatId) {

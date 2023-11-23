@@ -1,13 +1,12 @@
 package com.ssafy.homer.chat.model.dto;
 
-import java.io.Serializable;
-
-import lombok.Data;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class ChatMessage{
 	/**
 	 * 
@@ -24,5 +23,6 @@ public class ChatMessage{
 	private MessageType type;
 	private String roomId;
 	private String sender;
+	private String profileUrl;
 	private String message;
 }

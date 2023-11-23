@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +30,17 @@ public class ChatroomEntity {
     @Column
     String chatroomName;
 
+    @Column
+    String profileUrl;
+    
+    @Column(columnDefinition = "text")
+    String lastChat;
+    
+    @Column
+    String lastChatter;
+
+    @UpdateTimestamp
+    Timestamp lastUpdated;
 
     @CreationTimestamp
     Timestamp createdAt;

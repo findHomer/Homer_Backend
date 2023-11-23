@@ -46,5 +46,10 @@ public class ChatRedisRepository {
     public void sendChat(String roomId, ChatMessage message) {
         opsListChat.rightPush(CHAT+roomId, message);
     }
+    
+    public void reloadChat(String roomId, List<ChatMessage> messages) {
+        opsListChat.rightPushAll(CHAT+roomId, messages);
+    }
+    
 
 }
