@@ -37,8 +37,25 @@ public class ChatServiceImpl implements ChatService {
 
 	@Override
 	public List<ChatRoom> getAllChatRoom() {
-		return chatroomRedisRepository.findAllRoom();
+		List<ChatRoom> rooms = chatroomRedisRepository.findAllRoom();
+
 		// TODO mysql과 연동
+		// mysql 확인 하기
+		if(rooms == null || rooms.size() == 0){
+			List<ChatroomEntity> data = chatroomRepository.findAll();
+			rooms = data.stream().map(m -> ChatRoom.builder()
+							.roomId(m.getChatroomId())
+							.name(m.getChatroomName())
+							.lastChat(m.getLastChat())
+							.lastChatter(m.getLastChatter())
+							.profileUrl(m.getProfileUrl())
+							.lastUpdated(m.getLastUpdated())
+
+							.build())
+					.collect(Collectors.toList());
+			chatroomRedisRepository.reloadChatRoom(rooms);
+		}
+		return rooms;
 	}
 
 	@Override
@@ -105,6 +122,9 @@ public class ChatServiceImpl implements ChatService {
 		redisPublisher.publish(chatroomRedisRepository.getTopic(message.getRoomId()), message);
 		chatRedisRepository.sendChat(message.getRoomId(), message); // redis에 저장
 
+		// last chatter 갱신
+
+
 		// 해당하는 챗을 mysql로 저장한다.
 		Optional<User> user = userRepository.findByEmail(message.getSender());
 
@@ -129,13 +149,14 @@ public class ChatServiceImpl implements ChatService {
 		List<ChatMessage> msgs = chatRedisRepository.findAllChat(chatroomId);
 
 		// redis에 있으면 전달
-		if (msgs != null) {
+		if (msgs != null && !msgs.isEmpty()) {
 			return msgs;
 		}
 
 		// 없으면 mysql에서 가지고 오기
 		for(ChatEntity entity : chatRepository.findByChatroomId(chatroomId)) {
-			Optional<User> user = userRepository.findByUserId(entity.getUserId().intValue());
+			System.out.println(entity);
+			Optional<User> user = userRepository.findByUserId(entity.getUserId());
 			
 			//모든 데이터 챗으로 저장하기
 			chatRedisRepository.sendChat(chatroomId, ChatMessage.builder()
@@ -143,7 +164,8 @@ public class ChatServiceImpl implements ChatService {
 					.message(entity.getContents())
 					.profileUrl(user.orElse(User.builder().userPhoto("").build()).getUserPhoto())
 					.sender(user.orElse(User.builder().nickname("Guest").build()).getNickname())
-					.build()
+							.sendTime(entity.getSendTime())
+							.build()
 					);
 		}
 		

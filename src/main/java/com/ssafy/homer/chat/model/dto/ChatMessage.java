@@ -1,21 +1,17 @@
 package com.ssafy.homer.chat.model.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.sql.Timestamp;
 
 @Getter
 @Setter
 @Builder
-public class ChatMessage{
-	/**
-	 * 
-	 */
-//	private static final long serialVersionUID = -1445846086349013883L;
-	/**
-	 * 
-	 */
-	
+@NoArgsConstructor
+@AllArgsConstructor
+public class
+ChatMessage{
+
 	public enum MessageType{
 		ENTER, TALK
 	}
@@ -25,4 +21,5 @@ public class ChatMessage{
 	private String sender;
 	private String profileUrl;
 	private String message;
+	private Timestamp sendTime;
 }

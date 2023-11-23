@@ -3,6 +3,7 @@ package com.ssafy.homer.chat.model.repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -43,6 +44,11 @@ public class ChatRoomRedisRepository {
 
     public ChatRoom findRoomById(String id) {
         return opsHashChatRoom.get(CHAT_ROOMS, id);
+    }
+
+    public void reloadChatRoom(List<ChatRoom> chatRooms){
+        Map<String, ChatRoom> param = chatRooms.stream().collect(Collectors.toMap(ChatRoom::getRoomId, i2 -> i2 ));
+        opsHashChatRoom.putAll(CHAT_ROOMS, param);
     }
 
     /**

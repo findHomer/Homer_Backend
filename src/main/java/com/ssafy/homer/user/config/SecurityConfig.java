@@ -79,7 +79,7 @@ public class SecurityConfig{
                 .authorizeHttpRequests((authorize) -> authorize
                         // /api 시작하는 URL에 대한 접근 제어
                 		.antMatchers("/api/v1/users/ping","/api/v1/login","/api/v1/users/signup","/api/v1/users/silent-refresh").permitAll()
-                        .antMatchers("/api/v1/users/**","/api/v1/bookmarks/**").hasAnyRole("USER", "ADMIN")
+                        .antMatchers("/api/v1/users/**","/api/v1/bookmarks/**", "/api/v1/chat/**").hasAnyRole("USER", "ADMIN")
                         // /admin 시작하는 URL에 대한 접근 제어
                         .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         // 나머지 URL에 대한 접근 허용
