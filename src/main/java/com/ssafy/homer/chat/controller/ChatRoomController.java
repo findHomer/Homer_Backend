@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ssafy.homer.chat.model.dto.ChatRoom;
-import com.ssafy.homer.chat.model.repository.ChatRoomRepository;
+import com.ssafy.homer.chat.model.repository.ChatRoomRedisRepository;
+import com.ssafy.homer.chat.model.service.ChatService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,8 +22,9 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/chat")
 public class ChatRoomController {
 
- private final ChatRoomRepository chatRoomRepository;
-
+ private final ChatRoomRedisRepository chatRoomRepository;
+// private final ChatRedisService chatRedisService;
+ 
  // 채팅 리스트 화면
  @GetMapping("/room")
  public String rooms(Model model) {

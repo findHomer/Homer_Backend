@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Repository
-public class ChatRoomRepository {
+public class ChatRoomRedisRepository {
     // 채팅방(topic)에 발행되는 메시지를 처리할 Listner
     private final RedisMessageListenerContainer redisMessageListener;
     // 구독 처리 서비스
@@ -53,7 +53,12 @@ public class ChatRoomRepository {
         opsHashChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
         return chatRoom;
     }
-
+    
+    //다시 접속할때 레디스에 올리는 로직
+    public void reenterChatRoom(ChatRoom chatRoom) {
+    	opsHashChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
+    }
+    
     /**
      * 채팅방 입장 : redis에 topic을 만들고 pub/sub 통신을 하기 위해 리스너를 설정한다.
      */

@@ -20,5 +20,5 @@ public class ChatParticipantEntity {
     Long user_id;
 
     @Column
-    Long chatroom_id;
+    String chatroom_id;
 }
