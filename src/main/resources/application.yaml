@@ -1,1 +1,25 @@
-
+spring:
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: false
+  freemarker:
+    template-loader-path: classpath:/templates
+    suffix : .ftl
+    cache: false
+ 
+#  datasource:
+#    url : jdbc:mysql://3.36.127.172:3306/homerDB?autoReconnect=true&serverTimezone=UTC&useUniCode=yes&characterEncoding=UTF-8
+#    hikari:
+#      driver-class-name : com.mysql.cj.jdbc.Driver
+#      username: root
+#      password: ssafy
+#      pool-name: Hikari Connection Pool
+#      maximum-pool-size: 50
+#      minimum-idle: 50
+#      connection-timeout: 5000
+#      connection-init-sql: SELECT 1
+#      idle-timeout: 600000 
+#      max-lifetime: 1800000
+#      auto-commit: true
