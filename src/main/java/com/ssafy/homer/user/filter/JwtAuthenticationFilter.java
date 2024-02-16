@@ -91,7 +91,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             Authentication authResult
     ) throws IOException {
 
-        MyUserDetail user = (MyUserDetail) authResult.getPrincipal();//이쪽 잘되는지 확인 필요
+        MyUserDetail user = (MyUserDetail) authResult.getPrincipal();
         
         String accessToken = jwtUtil.createAccessToken(user.getUser());
         String refreshToken = jwtUtil.createRefreshToken(user.getUser());
