@@ -30,14 +30,10 @@ import com.ssafy.homer.user.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
-//config 에서 의존하는 Bean을 주입
-	
 	private final RedisService redisService;
 	
 	private final AuthenticationManager authenticationManager;
 	private final JwtUtil jwtUtil;
-	//private final ProviderManager manager;
-	//private final DaoAuthenticationProvider st; 
 
     public JwtAuthenticationFilter(RedisService redisService,AuthenticationManager authenticationManager,JwtUtil jwtUtil){
         this.redisService = redisService;
@@ -75,9 +71,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			//에러 던지기
 			return null;
 		}
-
-        
-        
           }
 
     /**
@@ -92,11 +85,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     ) throws IOException {
 
         MyUserDetail user = (MyUserDetail) authResult.getPrincipal();
-        
+
         String accessToken = jwtUtil.createAccessToken(user.getUser());
         String refreshToken = jwtUtil.createRefreshToken(user.getUser());
-        ;
-        // Redis에 Refresh Token 저장
+         // Redis에 Refresh Token 저장
         redisService.saveRefreshToken(user.getUsername(),refreshToken);
 
         response.setContentType("application/json");
