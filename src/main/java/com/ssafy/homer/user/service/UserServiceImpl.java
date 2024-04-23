@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public void signup(SignupDto signupDto) {
 		Optional<User> user = userRepository.findByEmail(signupDto.getEmail());//중복예외 던져줌
-		System.out.println(passwordEncoder.encode(signupDto.getPassword()));
+
 		if(user.isPresent()) {
 			//중복예외처리
 			return;
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public MyPageDto getMyInfo() {
 		String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-		System.out.println("email "+email);
+
 		User user = userRepository.findByEmail(email).orElseThrow(null);
 
 		return MyPageDto.builder()
@@ -79,9 +79,8 @@ public class UserServiceImpl implements UserService{
 	public String refresh(String refreshToken) {
 		jwtUtil.verifyRefreshToken(refreshToken);
 		String email = jwtUtil.getEmail(refreshToken);
-		System.out.println(email);
+
 		RefreshTokenDto realRefreshToken = redisRepository.findById(email).orElseThrow(null);
-		System.out.println(realRefreshToken.getToken());
 
 		if(refreshToken.equals(realRefreshToken.getToken())){
 			User user = userRepository.findByEmail(email).orElseThrow(null);
@@ -94,7 +93,6 @@ public class UserServiceImpl implements UserService{
 	public void addProfile(MultipartFile multipartFile) {
 		try {
 			String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-			System.out.println("email "+email);
 			User user = userRepository.findByEmail(email).orElseThrow(null);
 			String url = s3Uploader.upload(multipartFile, "user");
 			//사용자 url 저장

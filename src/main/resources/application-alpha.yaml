@@ -1,6 +1,0 @@
-spring:
-  profiles:
-    active: alpha
-  redis:
-    host: 13.125.19.18
-    port: 6379
