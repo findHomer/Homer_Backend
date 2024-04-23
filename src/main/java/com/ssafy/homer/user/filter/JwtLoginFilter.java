@@ -84,8 +84,6 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter{
          // Redis에 Refresh Token 저장
         redisService.saveRefreshToken(user.getUsername(),refreshToken);
 
-        response.setContentType("application/json");
-        
         Map<String, String> token = new HashMap<>();
         token.put("accessToken", accessToken);
         response.setContentType("application/json");
