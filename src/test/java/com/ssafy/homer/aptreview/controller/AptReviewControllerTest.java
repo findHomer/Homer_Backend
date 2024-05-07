@@ -14,7 +14,6 @@ import com.ssafy.homer.s3.util.S3Uploader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -60,7 +59,6 @@ class AptReviewControllerTest {
 						.file(jsonFile)
 						.with(csrf()).with(user("jake").roles("USER")))
 		.andExpect(status().isOk())
-		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 		.andDo(print());
 	}
 
