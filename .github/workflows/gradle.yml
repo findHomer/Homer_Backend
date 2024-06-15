@@ -32,7 +32,7 @@ jobs:
       
       #Build
     - name: Build with Gradle
-      run : ./gradlew clean build
+      run : ./gradlew clean build -i
       
     - name: Rename jar for deploy
       run: mv build/libs/homer-0.0.1-SNAPSHOT.jar build/libs/app.jar
