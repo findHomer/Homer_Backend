@@ -21,12 +21,14 @@ import com.ssafy.homer.apartInfo.repository.ApartInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 
+import javax.transaction.Transactional;
+
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ApartInfoServiceImpl implements ApartInfoService{
 	
 	private final ApartInfoRepository apartInfoRepository;
-	private final UserRepository userRepository;
 	@Override
 	public List<ApartInfoDto> findTotalApart() {
 		return apartInfoRepository.findSimpleAll();

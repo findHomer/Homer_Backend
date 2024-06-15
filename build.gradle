@@ -63,6 +63,9 @@ dependencies {
 	// https://mvnrepository.com/artifact/it.ozimov/embedded-redis
 	implementation 'it.ozimov:embedded-redis:0.7.2'
 
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
 }
 
 // QueryDSL 소스 디렉토리 설정
