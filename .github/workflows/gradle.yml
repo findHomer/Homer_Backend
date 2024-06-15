@@ -32,7 +32,7 @@ jobs:
       
       #Build
     - name: Build with Gradle
-      run : ./gradlew clean build -i
+      run : ./gradlew clean build
       
     - name: Rename jar for deploy
       run: mv build/libs/homer-0.0.1-SNAPSHOT.jar build/libs/app.jar
@@ -42,7 +42,7 @@ jobs:
         touch .env;
         echo "MYSQL_PASSWORD=${{secrets.MYSQL_PASSWORD}}" > .env;
         echo "MYSQL_USERNAME=${{secrets.MYSQL_USERNAME}}" >> .env;
-        echo "EC2_HOST=${{secrets.EC2_HOST}}"  >> .env;
+        echo "MYSQL_HOST=${{secrets.MYSQL_HOST}}"  >> .env;
 
         echo "S3_ACCESS_KEY=${{secrets.S3_ACCESS_KEY}}" >> .env;
         echo "S3_SECRET_KEY=${{secrets.S3_SECRET_KEY}}" >> .env;
@@ -106,3 +106,4 @@ jobs:
             sudo docker pull ojin/homer-server:latest
             sudo docker run -d --name homer-container -p 8080:8080 --env-file .env ojin/homer-server
             sudo docker ps -a
+            sudo docker logs -f homer-container
