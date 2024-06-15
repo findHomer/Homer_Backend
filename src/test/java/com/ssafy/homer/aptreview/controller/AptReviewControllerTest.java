@@ -34,7 +34,7 @@ class AptReviewControllerTest {
 	AptReviewService aptReviewService;
 
 	@MockBean
-	S3Uploader s3uploader;;
+	S3Uploader s3uploader;
 
 	@Autowired
 	private MockMvc mockMvc;
