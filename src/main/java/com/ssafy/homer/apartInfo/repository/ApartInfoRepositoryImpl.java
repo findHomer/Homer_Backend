@@ -130,7 +130,7 @@ public class ApartInfoRepositoryImpl implements ApartInfoRepositoryCustom{
 	}
 	
 	private BooleanExpression goeHouseholdCount(Integer householdCount) {
-		if(householdCount==null) {
+		if(householdCount==null||householdCount==0.0) {
 			return null;
 		}
 		return QApartInfo.apartInfo.householdCount.goe(householdCount);
