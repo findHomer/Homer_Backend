@@ -100,10 +100,11 @@ jobs:
           key:  ${{secrets.EC2_SSH_KEY}}
           port:  ${{secrets.EC2_SSH_PORT}}
           script: |
+            mkdir -p /path/to/host/dump
             cd app
             sudo docker stop homer-container || true && sudo docker rm homer-container || true
             sudo docker rmi ojin/homer-server:latest || true
             sudo docker pull ojin/homer-server:latest
-            sudo docker run -d --name homer-container -p 8080:8080 --env-file .env ojin/homer-server
+            sudo docker run -d -v /path/to/host/dump:/usr/src/app/dump --name homer-container -p 8080:8080 --env-file .env ojin/homer-server
             sudo docker ps -a
-            sudo docker logs -f homer-container
+    
