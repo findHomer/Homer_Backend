@@ -50,34 +50,38 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 	public ApartInfoDetailDto findApartDetail(String apartId) {
 		 ApartInfo apartInfo =  apartInfoRepository.findById(apartId).orElseThrow(() -> new BaseException(ErrorCode.APART_NOT_FOUND));
 
-		 Boolean mark=false;
-		 //userId로 토큰 저장값 바꾸기
-
-		List<String> emails = new ArrayList<>();
-
-		for(Bookmark bookmark: apartInfo.getBookmarkList()) {
-			emails.add(bookmark.getUser().getEmail());
-		}
-
-		 List<ApartDealAreaDto> apartDealAreaDtoList = new ArrayList<ApartDealAreaDto>();
-
 		 //전용면적을 key로 apartDealDto를 넣어줌
-		TreeMap<Float,ArrayList<ApartDealDto>> map = new TreeMap<>();
-		for(ApartDeal deal: apartInfo.getApartDealList()){
-			ArrayList<ApartDealDto> arr = map.getOrDefault(deal.getExclusiveArea(),new ArrayList<ApartDealDto>());
+		TreeMap<Float,ArrayList<ApartDealDto>> apartTransactionInfo = new TreeMap<>();
 
-			arr.add(ApartDealDto.builder()
-					.dealId(deal.getDealId())
-					.floor(deal.getFloor())
-					.transactionAmount(deal.getTransactionAmount().trim())
-					.transactionDate(deal.getTransactionDate())
-					.build());
+		//전용면적 기준 데이터 정리
+		divideDataByArea(apartTransactionInfo,apartInfo);
 
-			map.put(deal.getExclusiveArea(),arr);
-		}
+		//전용면적별 아파트 거래내역 및 평균 계산
+		List<ApartDealAreaDto> apartDealAreaDtoList = new ArrayList<ApartDealAreaDto>();
+		calcApartDealList(apartDealAreaDtoList,apartTransactionInfo);
+
+		 ApartInfoDetailDto apartInfoDetailDto = ApartInfoDetailDto.builder()
+				 .aptId(apartInfo.getAptId())
+				 .aisleType(apartInfo.getAisleType())
+				 .allowDate(apartInfo.getAllowDate())
+				 .aptName(apartInfo.getAptName())
+				 .parkPerHouse(apartInfo.getParkPerHouse())//소수점자릿수 체크
+				 .lawAddr(apartInfo.getLawAddr())
+				 .roadAddr(apartInfo.getRoadAddr())
+				 .dongCount(apartInfo.getDongCount())
+				 .maxFloor(apartInfo.getMaxFloor())
+				 .lat(apartInfo.getLat())
+				 .lng(apartInfo.getLng())
+				 .householdCount(apartInfo.getHouseholdCount())
+				 .dealInfos(apartDealAreaDtoList)
+				 .build();
+
+		return apartInfoDetailDto;
+	}
+	public void calcApartDealList(List<ApartDealAreaDto> apartDealAreaDtoList,TreeMap<Float,ArrayList<ApartDealDto>> apartTransactionInfo){
 		LocalDate threeYearsAgo = LocalDate.now().minusYears(3);
 
-		for(Map.Entry<Float,ArrayList<ApartDealDto>> e: map.entrySet()){
+		for(Map.Entry<Float,ArrayList<ApartDealDto>> e: apartTransactionInfo.entrySet()){
 			Map<String, MonthlyData> monthlyDataMap = new HashMap<>();
 			for(ApartDealDto deal: e.getValue()) {
 				LocalDate transactionDate = deal.getTransactionDate();
@@ -92,37 +96,33 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 				}
 
 			}
-			ArrayList<AverageMonthDto> averageMonthDtos = new ArrayList<>();
+			ArrayList<AverageMonthDto> averageMonthDtoList = new ArrayList<>();
 			LocalDate startDate = LocalDate.now().minusYears(3);
 			LocalDate endDate = LocalDate.now();
 
 			while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
 
-				averageMonthDtos.add(new AverageMonthDto(startDate.format(DateTimeFormatter.ofPattern("yy.MM")),monthlyDataMap.getOrDefault(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")),new MonthlyData()).getAverage()));
+				averageMonthDtoList.add(new AverageMonthDto(startDate.format(DateTimeFormatter.ofPattern("yy.MM")),monthlyDataMap.getOrDefault(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")),new MonthlyData()).getAverage()));
 				startDate = startDate.plusMonths(1);
 			}
-			apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(),e.getValue(),averageMonthDtos));
+			apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(),e.getValue(),averageMonthDtoList));
 		}
 
-		//
-		 ApartInfoDetailDto apartInfoDetailDto = ApartInfoDetailDto.builder()
-				 .aptId(apartInfo.getAptId())
-				 .aisleType(apartInfo.getAisleType())
-				 .allowDate(apartInfo.getAllowDate())
-				 .aptName(apartInfo.getAptName())
-				 .parkPerHouse(apartInfo.getParkPerHouse())//소수점자릿수 체크
-				 .lawAddr(apartInfo.getLawAddr())
-				 .roadAddr(apartInfo.getRoadAddr())
-				 .dongCount(apartInfo.getDongCount())
-				 .maxFloor(apartInfo.getMaxFloor())
-				 .lat(apartInfo.getLat())
-				 .lng(apartInfo.getLng())
-				 .householdCount(apartInfo.getHouseholdCount())
-				 .emails(emails)
-				 .dealInfos(apartDealAreaDtoList)
-				 .build();
+	}
 
-		return apartInfoDetailDto;
+	public void divideDataByArea(Map<Float,ArrayList<ApartDealDto>> map,ApartInfo apartInfo){
+		for(ApartDeal deal: apartInfo.getApartDealList()){
+			ArrayList<ApartDealDto> arr = map.getOrDefault(deal.getExclusiveArea(),new ArrayList<ApartDealDto>());
+
+			arr.add(ApartDealDto.builder()
+					.dealId(deal.getDealId())
+					.floor(deal.getFloor())
+					.transactionAmount(deal.getTransactionAmount().trim())
+					.transactionDate(deal.getTransactionDate())
+					.build());
+
+			map.put(deal.getExclusiveArea(),arr);
+		}
 	}
 
 	@Override
