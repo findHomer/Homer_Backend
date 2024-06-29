@@ -3,32 +3,32 @@ package com.ssafy.homer.apartInfo.service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.ssafy.homer.apartInfo.domain.ApartDeal;
 import com.ssafy.homer.apartInfo.domain.ApartInfo;
 import com.ssafy.homer.apartInfo.dto.*;
-import com.ssafy.homer.bookmark.domain.Bookmark;
 import com.ssafy.homer.exception.BaseException;
 import com.ssafy.homer.exception.ErrorCode;
-import com.ssafy.homer.user.domain.MyUserDetail;
-import com.ssafy.homer.user.domain.User;
-import com.ssafy.homer.user.repository.UserRepository;
-import org.springframework.security.core.context.SecurityContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.homer.apartInfo.repository.ApartInfoRepository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ApartInfoServiceImpl implements ApartInfoService{
 	
 	private final ApartInfoRepository apartInfoRepository;
+
 	@Override
 	public List<ApartInfoDto> findTotalApart() {
 		return apartInfoRepository.findSimpleAll();
@@ -42,11 +42,12 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 
 	@Override
 	public List<ApartInfoDto> findApartByName(SearchNameDto searchNameDto) {
-		System.out.println(searchNameDto);
 		return apartInfoRepository.searchName(searchNameDto);
 	}
 
 	@Override
+
+	
 	public ApartInfoDetailDto findApartDetail(String apartId) {
 		 ApartInfo apartInfo =  apartInfoRepository.findById(apartId).orElseThrow(() -> new BaseException(ErrorCode.APART_NOT_FOUND));
 
@@ -58,9 +59,21 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 
 		//전용면적별 아파트 거래내역 및 평균 계산
 		List<ApartDealAreaDto> apartDealAreaDtoList = new ArrayList<ApartDealAreaDto>();
-		calcApartDealList(apartDealAreaDtoList,apartTransactionInfo);
+		//calcApartDealList(apartDealAreaDtoList,apartTransactionInfo);
 
-		 ApartInfoDetailDto apartInfoDetailDto = ApartInfoDetailDto.builder()
+		//비동기방식
+		int processors = Runtime.getRuntime().availableProcessors();
+		int threadPoolSize = Math.max(2,processors);
+		ExecutorService customThreadPool = Executors.newFixedThreadPool(threadPoolSize);
+
+		apartTransactionInfo.entrySet().forEach(key ->
+				CompletableFuture.runAsync(() -> aSyncCalcApartDealList(key,apartDealAreaDtoList),customThreadPool)
+						.exceptionally(throwable -> {
+							log.error("Exception occured: "+ throwable.getMessage());
+							return null;
+						}));
+
+		ApartInfoDetailDto apartInfoDetailDto = ApartInfoDetailDto.builder()
 				 .aptId(apartInfo.getAptId())
 				 .aisleType(apartInfo.getAisleType())
 				 .allowDate(apartInfo.getAllowDate())
@@ -68,6 +81,7 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 				 .parkPerHouse(apartInfo.getParkPerHouse())//소수점자릿수 체크
 				 .lawAddr(apartInfo.getLawAddr())
 				 .roadAddr(apartInfo.getRoadAddr())
+				 .emails(new ArrayList<String>())
 				 .dongCount(apartInfo.getDongCount())
 				 .maxFloor(apartInfo.getMaxFloor())
 				 .lat(apartInfo.getLat())
@@ -89,7 +103,7 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 				// 최근 3년 데이터만 처리
 				if (transactionDate.isAfter(threeYearsAgo)) {
 					String monthYearKey = transactionDate.format(DateTimeFormatter.ofPattern("yyyy-MM"));
-					MonthlyData monthlyData = monthlyDataMap.getOrDefault(monthYearKey, new MonthlyData());
+					MonthlyData monthlyData = monthlyDataMap.getOrDefault(monthYearKey, new MonthlyData(0,0));
 
 					monthlyData.addDeal(Integer.parseInt(deal.getTransactionAmount().replace(",", "")));
 					monthlyDataMap.put(monthYearKey, monthlyData);
@@ -102,11 +116,47 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 
 			while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
 
-				averageMonthDtoList.add(new AverageMonthDto(startDate.format(DateTimeFormatter.ofPattern("yy.MM")),monthlyDataMap.getOrDefault(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")),new MonthlyData()).getAverage()));
+				averageMonthDtoList.add(new AverageMonthDto(startDate.format(DateTimeFormatter.ofPattern("yy.MM")),monthlyDataMap.getOrDefault(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")),new MonthlyData(0,0)).getAverage()));
 				startDate = startDate.plusMonths(1);
 			}
 			apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(),e.getValue(),averageMonthDtoList));
 		}
+
+	}
+	public void aSyncCalcApartDealList(Map.Entry<Float,ArrayList<ApartDealDto>> e, List<ApartDealAreaDto> apartDealAreaDtoList){
+		LocalDate threeYearsAgo = LocalDate.now().minusYears(3);
+
+		Map<String, MonthlyData> monthlyDataMap = new HashMap<>();
+		for(ApartDealDto deal: e.getValue()) {
+			LocalDate transactionDate = deal.getTransactionDate();
+
+			// 최근 3년 데이터만 처리
+			if (transactionDate.isAfter(threeYearsAgo)) {
+				String monthYearKey = transactionDate.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+				MonthlyData monthlyData = monthlyDataMap.getOrDefault(monthYearKey, new MonthlyData(0,0));
+
+				monthlyData.addDeal(Integer.parseInt(deal.getTransactionAmount().replace(",", "")));
+				monthlyDataMap.put(monthYearKey, monthlyData);
+			}
+
+		}
+		ArrayList<AverageMonthDto> averageMonthDtoList = new ArrayList<>();
+		LocalDate startDate = LocalDate.now().minusYears(3);
+		LocalDate endDate = LocalDate.now();
+
+		while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
+
+			averageMonthDtoList.add(new AverageMonthDto(startDate.format(DateTimeFormatter.ofPattern("yy.MM")),monthlyDataMap.getOrDefault(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")),new MonthlyData(0,0)).getAverage()));
+			startDate = startDate.plusMonths(1);
+		}
+		apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(),e.getValue(),averageMonthDtoList));
+		//System.out.println("hello");
+	}
+
+	public void aSyncCalcApartDealList(List<ApartDealAreaDto> apartDealAreaDtoList,TreeMap<Float,ArrayList<ApartDealDto>> apartTransactionInfo){
+
+
+
 
 	}
 
@@ -140,8 +190,13 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 }
 class MonthlyData {
 	// 월별 데이터 집계 클래스
-	private int totalAmount = 0;
-	private int count = 0;
+	private int totalAmount ;
+	private int count ;
+
+	public MonthlyData(int totalAmount,int count){
+		this.totalAmount = totalAmount;
+		this.count = count;
+	}
 
 	public void addDeal(int amount) {
 		totalAmount += amount;
