@@ -46,8 +46,6 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 	}
 
 	@Override
-
-	
 	public ApartInfoDetailDto findApartDetail(String apartId) {
 		 ApartInfo apartInfo =  apartInfoRepository.findById(apartId).orElseThrow(() -> new BaseException(ErrorCode.APART_NOT_FOUND));
 
@@ -65,13 +63,21 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 		int processors = Runtime.getRuntime().availableProcessors();
 		int threadPoolSize = Math.max(2,processors);
 		ExecutorService customThreadPool = Executors.newFixedThreadPool(threadPoolSize);
+		// 비동기 작업 리스트
+		List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-		apartTransactionInfo.entrySet().forEach(key ->
-				CompletableFuture.runAsync(() -> aSyncCalcApartDealList(key,apartDealAreaDtoList),customThreadPool)
-						.exceptionally(throwable -> {
-							log.error("Exception occured: "+ throwable.getMessage());
-							return null;
-						}));
+		apartTransactionInfo.entrySet().forEach(entry ->
+				futures.add(
+						CompletableFuture.runAsync(() -> aSyncCalcApartDealList(entry, apartDealAreaDtoList), customThreadPool)
+								.exceptionally(throwable -> {
+									log.error("Exception occurred: " + throwable.getMessage());
+									return null;
+								})
+				)
+		);
+
+		CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+		allOf.join();  // 모든 작업이 완료될 때까지 기다림
 
 		ApartInfoDetailDto apartInfoDetailDto = ApartInfoDetailDto.builder()
 				 .aptId(apartInfo.getAptId())
