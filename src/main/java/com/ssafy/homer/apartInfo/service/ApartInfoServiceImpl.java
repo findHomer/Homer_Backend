@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import com.ssafy.homer.apartInfo.domain.ApartDeal;
 import com.ssafy.homer.apartInfo.domain.ApartInfo;
@@ -13,6 +14,7 @@ import com.ssafy.homer.apartInfo.dto.*;
 import com.ssafy.homer.exception.BaseException;
 import com.ssafy.homer.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.homer.apartInfo.repository.ApartInfoRepository;
@@ -59,25 +61,20 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 		List<ApartDealAreaDto> apartDealAreaDtoList = new ArrayList<ApartDealAreaDto>();
 		//calcApartDealList(apartDealAreaDtoList,apartTransactionInfo);
 
+		/**
 		//비동기방식
 		int processors = Runtime.getRuntime().availableProcessors();
 		int threadPoolSize = Math.max(2,processors);
 		ExecutorService customThreadPool = Executors.newFixedThreadPool(threadPoolSize);
+		 **/
 		// 비동기 작업 리스트
-		List<CompletableFuture<Void>> futures = new ArrayList<>();
-
-		apartTransactionInfo.entrySet().forEach(entry ->
-				futures.add(
-						CompletableFuture.runAsync(() -> aSyncCalcApartDealList(entry, apartDealAreaDtoList), customThreadPool)
-								.exceptionally(throwable -> {
-									log.error("Exception occurred: " + throwable.getMessage());
-									return null;
-								})
-				)
-		);
+		List<CompletableFuture<Void>> futures = apartTransactionInfo.entrySet().stream()
+						.map(entry -> aSyncCalcApartDealList(entry, apartDealAreaDtoList))
+						.collect(Collectors.toList());
 
 		CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 		allOf.join();  // 모든 작업이 완료될 때까지 기다림
+
 
 		ApartInfoDetailDto apartInfoDetailDto = ApartInfoDetailDto.builder()
 				 .aptId(apartInfo.getAptId())
@@ -98,6 +95,8 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 
 		return apartInfoDetailDto;
 	}
+
+
 	public void calcApartDealList(List<ApartDealAreaDto> apartDealAreaDtoList,TreeMap<Float,ArrayList<ApartDealDto>> apartTransactionInfo){
 		LocalDate threeYearsAgo = LocalDate.now().minusYears(3);
 
@@ -129,7 +128,9 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 		}
 
 	}
-	public void aSyncCalcApartDealList(Map.Entry<Float,ArrayList<ApartDealDto>> e, List<ApartDealAreaDto> apartDealAreaDtoList){
+
+	@Async("taskExecutor")
+	public CompletableFuture<Void> aSyncCalcApartDealList(Map.Entry<Float,ArrayList<ApartDealDto>> e, List<ApartDealAreaDto> apartDealAreaDtoList){
 		LocalDate threeYearsAgo = LocalDate.now().minusYears(3);
 
 		Map<String, MonthlyData> monthlyDataMap = new HashMap<>();
@@ -157,13 +158,7 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 		}
 		apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(),e.getValue(),averageMonthDtoList));
 		//System.out.println("hello");
-	}
-
-	public void aSyncCalcApartDealList(List<ApartDealAreaDto> apartDealAreaDtoList,TreeMap<Float,ArrayList<ApartDealDto>> apartTransactionInfo){
-
-
-
-
+		return CompletableFuture.completedFuture(null);
 	}
 
 	public void divideDataByArea(Map<Float,ArrayList<ApartDealDto>> map,ApartInfo apartInfo){
