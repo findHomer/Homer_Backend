@@ -1,12 +1,11 @@
 package com.ssafy.homer.apartInfo.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-import com.ssafy.homer.apartInfo.dto.ApartInfoDetailDto;
-import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
-import com.ssafy.homer.apartInfo.dto.MapLocationDto;
-import com.ssafy.homer.apartInfo.dto.SearchMapDto;
-import com.ssafy.homer.apartInfo.dto.SearchNameDto;
+import com.ssafy.homer.apartInfo.dto.*;
 
 
 public interface ApartInfoService {
@@ -19,4 +18,6 @@ public interface ApartInfoService {
 	ApartInfoDetailDto findApartDetail(String apartId);
 	
 	MapLocationDto findDongLocation(String entireCode);
+
+	CompletableFuture<Void> aSyncCalcApartDealList(Map.Entry<Float, ArrayList<ApartDealDto>> e, List<ApartDealAreaDto> apartDealAreaDtoList) throws InterruptedException;
 }
