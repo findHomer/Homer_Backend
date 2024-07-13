@@ -55,23 +55,12 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 	@Override
 	public ApartInfoDetailDto findApartDetail(String apartId) {
 		 ApartInfo apartInfo =  apartInfoRepository.findById(apartId).orElseThrow(() -> new BaseException(ErrorCode.APART_NOT_FOUND));
-		 System.out.println(apartInfo.getParkPerHouse());
-		 //전용면적을 key로 apartDealDto를 넣어줌
-		TreeMap<Float,ArrayList<ApartDealDto>> apartTransactionInfo = new TreeMap<>();
 
 		//전용면적 기준 데이터 정리
-		divideDataByArea(apartTransactionInfo,apartInfo);
+		Map<Float,ArrayList<ApartDealDto>> apartTransactionInfo = divideDataByArea(apartInfo);
 
 		//전용면적별 아파트 거래내역 및 평균 계산
-		List<ApartDealAreaDto> apartDealAreaDtoList = new ArrayList<ApartDealAreaDto>();
-		//calcApartDealList(apartDealAreaDtoList,apartTransactionInfo);
-
-		/**
-		//비동기방식
-		int processors = Runtime.getRuntime().availableProcessors();
-		int threadPoolSize = Math.max(2,processors);
-		ExecutorService customThreadPool = Executors.newFixedThreadPool(threadPoolSize);
-		 **/
+		List<ApartDealAreaDto> apartDealAreaDtoList = new CustomSynchronizedArrayList<>();
 
 		ApartInfoService proxy = context.getBean(ApartInfoService.class);
 		// 비동기 작업 리스트
@@ -111,43 +100,9 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 	}
 
 
-	public void calcApartDealList(List<ApartDealAreaDto> apartDealAreaDtoList,TreeMap<Float,ArrayList<ApartDealDto>> apartTransactionInfo){
-		LocalDate threeYearsAgo = LocalDate.now().minusYears(3);
-
-		for(Map.Entry<Float,ArrayList<ApartDealDto>> e: apartTransactionInfo.entrySet()){
-			Map<String, MonthlyData> monthlyDataMap = new HashMap<>();
-			for(ApartDealDto deal: e.getValue()) {
-				LocalDate transactionDate = deal.getTransactionDate();
-
-				// 최근 3년 데이터만 처리
-				if (transactionDate.isAfter(threeYearsAgo)) {
-					String monthYearKey = transactionDate.format(DateTimeFormatter.ofPattern("yyyy-MM"));
-					MonthlyData monthlyData = monthlyDataMap.getOrDefault(monthYearKey, new MonthlyData(0,0));
-
-					monthlyData.addDeal(Integer.parseInt(deal.getTransactionAmount().replace(",", "")));
-					monthlyDataMap.put(monthYearKey, monthlyData);
-				}
-
-			}
-			ArrayList<AverageMonthDto> averageMonthDtoList = new ArrayList<>();
-			LocalDate startDate = LocalDate.now().minusYears(3);
-			LocalDate endDate = LocalDate.now();
-
-			while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
-
-				averageMonthDtoList.add(new AverageMonthDto(startDate.format(DateTimeFormatter.ofPattern("yy.MM")),monthlyDataMap.getOrDefault(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")),new MonthlyData(0,0)).getAverage()));
-				startDate = startDate.plusMonths(1);
-			}
-			apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(),e.getValue(),averageMonthDtoList));
-		}
-
-	}
-
 	@Async("taskExecutor")
 	public CompletableFuture<Void> aSyncCalcApartDealList(Map.Entry<Float,ArrayList<ApartDealDto>> e, List<ApartDealAreaDto> apartDealAreaDtoList) throws InterruptedException {
-		logger.info("Async method started. Thread: " + Thread.currentThread().getName());
 		LocalDate threeYearsAgo = LocalDate.now().minusYears(3);
-
 		Map<String, MonthlyData> monthlyDataMap = new HashMap<>();
 		for(ApartDealDto deal: e.getValue()) {
 			LocalDate transactionDate = deal.getTransactionDate();
@@ -172,13 +127,14 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 			startDate = startDate.plusMonths(1);
 		}
 		apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(),e.getValue(),averageMonthDtoList));
-		//System.out.println("hello");
-		logger.info("Async method finished. Thread: " + Thread.currentThread().getName());
 
 		return CompletableFuture.completedFuture(null);
 	}
 
-	public void divideDataByArea(Map<Float,ArrayList<ApartDealDto>> map,ApartInfo apartInfo){
+	public Map<Float,ArrayList<ApartDealDto>> divideDataByArea(ApartInfo apartInfo){
+
+		Map<Float,ArrayList<ApartDealDto>> map = new HashMap<>();
+
 		for(ApartDeal deal: apartInfo.getApartDealList()){
 			ArrayList<ApartDealDto> arr = map.getOrDefault(deal.getExclusiveArea(),new ArrayList<ApartDealDto>());
 
@@ -191,6 +147,8 @@ public class ApartInfoServiceImpl implements ApartInfoService{
 
 			map.put(deal.getExclusiveArea(),arr);
 		}
+
+		return map;
 	}
 
 	@Override
@@ -223,5 +181,12 @@ class MonthlyData {
 
 	public float getAverage() {
 		return count == 0 ? 0 : (float) totalAmount / count;
+	}
+}
+
+class CustomSynchronizedArrayList<E> extends ArrayList<E> {
+	@Override
+	public synchronized boolean add(E element) {
+		return super.add(element);
 	}
 }
