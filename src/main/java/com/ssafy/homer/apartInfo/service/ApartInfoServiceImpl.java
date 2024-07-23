@@ -33,7 +33,7 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 
 	private final ApartInfoRepository apartInfoRepository;
 	private final ApplicationContext context;
-
+	private final RankingRedisService rankingRedisService;
 
 	@Override
 	public List<ApartInfoDto> findTotalApart() {
@@ -97,7 +97,7 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 				.householdCount(apartInfo.getHouseholdCount())
 				.dealInfos(apartDealAreaDtoList)
 				.build();
-
+		rankingRedisService.addOrUpdateId("rank",apartInfo.getAptId());
 		return apartInfoDetailDto;
 	}
 
