@@ -1,4 +1,4 @@
-package com.ssafy.homer.apartInfo.config;
+package com.ssafy.homer.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
