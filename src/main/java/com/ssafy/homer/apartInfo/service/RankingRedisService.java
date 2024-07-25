@@ -1,10 +1,15 @@
 package com.ssafy.homer.apartInfo.service;
 
-import lombok.RequiredArgsConstructor;
+import com.ssafy.homer.apartInfo.dto.RankingDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class RankingRedisService {
@@ -24,5 +29,22 @@ public class RankingRedisService {
 
     public Double getScore(String key, String id) {
         return zSetOperations.score(key, id);
+    }
+
+    public List<RankingDto> getTopRanks(String key, int count) {
+
+        Set<ZSetOperations.TypedTuple<String>> resultSet = zSetOperations.reverseRangeWithScores(key, 0, count - 1);
+        List<RankingDto> resultList = new ArrayList<>();
+
+        for (ZSetOperations.TypedTuple<String> item : resultSet) {
+            RankingDto rankingDto = RankingDto.builder()
+                    .aptId(item.getValue())
+                    .score(item.getScore().toString())
+                    .build();
+
+            resultList.add(rankingDto);
+        }
+
+        return resultList;
     }
 }
