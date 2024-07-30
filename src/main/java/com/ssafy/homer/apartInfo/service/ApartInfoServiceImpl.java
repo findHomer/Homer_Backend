@@ -14,8 +14,6 @@ import com.ssafy.homer.apartInfo.util.MonthlyData;
 import com.ssafy.homer.exception.BaseException;
 import com.ssafy.homer.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -33,6 +31,7 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 
 	private final ApartInfoRepository apartInfoRepository;
 	private final ApplicationContext context;
+	private final RankingRedisService rankingRedisService;
 
 
 	@Override
@@ -81,22 +80,11 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 
 		apartDealAreaDtoList.sort((o1, o2) -> (int) (o1.getExclusiveArea() - o2.getExclusiveArea()));
 
-		ApartInfoDetailDto apartInfoDetailDto = ApartInfoDetailDto.builder()
-				.aptId(apartInfo.getAptId())
-				.aisleType(apartInfo.getAisleType())
-				.allowDate(apartInfo.getAllowDate())
-				.aptName(apartInfo.getAptName())
-				.parkPerHouse(apartInfo.getParkPerHouse())//소수점자릿수 체크
-				.lawAddr(apartInfo.getLawAddr())
-				.roadAddr(apartInfo.getRoadAddr())
-				.emails(new ArrayList<String>())
-				.dongCount(apartInfo.getDongCount())
-				.maxFloor(apartInfo.getMaxFloor())
-				.lat(apartInfo.getLat())
-				.lng(apartInfo.getLng())
-				.householdCount(apartInfo.getHouseholdCount())
-				.dealInfos(apartDealAreaDtoList)
-				.build();
+		ApartInfoDetailDto apartInfoDetailDto = buildApartInfoDetailDto(apartInfo, apartDealAreaDtoList);
+
+		rankingRedisService.addOrUpdateId(apartInfo.getAptId());
+
+		rankingRedisService.addOrUpdateIdByUnit(apartInfo.getAptId());
 
 		return apartInfoDetailDto;
 	}
@@ -133,6 +121,11 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 		return CompletableFuture.completedFuture(null);
 	}
 
+	@Override
+	public List<RankingDto> getTopRanks() {
+		return rankingRedisService.getTopRanks( 5);
+	}
+
 	public Map<Float, ArrayList<ApartDealDto>> divideDataByArea(ApartInfo apartInfo) {
 
 		Map<Float, ArrayList<ApartDealDto>> map = new HashMap<>();
@@ -163,6 +156,23 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 				.build();
 	}
 
-
+	private ApartInfoDetailDto buildApartInfoDetailDto(ApartInfo apartInfo, List<ApartDealAreaDto> apartDealAreaDtoList) {
+		return ApartInfoDetailDto.builder()
+				.aptId(apartInfo.getAptId())
+				.aisleType(apartInfo.getAisleType())
+				.allowDate(apartInfo.getAllowDate())
+				.aptName(apartInfo.getAptName())
+				.parkPerHouse(apartInfo.getParkPerHouse())
+				.lawAddr(apartInfo.getLawAddr())
+				.roadAddr(apartInfo.getRoadAddr())
+				.emails(new ArrayList<>())
+				.dongCount(apartInfo.getDongCount())
+				.maxFloor(apartInfo.getMaxFloor())
+				.lat(apartInfo.getLat())
+				.lng(apartInfo.getLng())
+				.householdCount(apartInfo.getHouseholdCount())
+				.dealInfos(apartDealAreaDtoList)
+				.build();
+	}
 }
 

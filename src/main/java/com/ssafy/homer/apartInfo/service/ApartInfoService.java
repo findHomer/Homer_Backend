@@ -20,4 +20,6 @@ public interface ApartInfoService {
 	MapLocationDto findDongLocation(String entireCode);
 
 	CompletableFuture<Void> aSyncCalcApartDealList(Map.Entry<Float, ArrayList<ApartDealDto>> e, List<ApartDealAreaDto> apartDealAreaDtoList) throws InterruptedException;
+
+	List<RankingDto> getTopRanks();
 }

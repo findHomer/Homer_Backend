@@ -1,18 +1,15 @@
 package com.ssafy.homer.apartInfo.controller;
 
 import java.util.List;
+import java.util.Map;
 
-import com.ssafy.homer.apartInfo.dto.ApartInfoDetailDto;
-import com.ssafy.homer.apartInfo.dto.SearchNameDto;
+import com.ssafy.homer.apartInfo.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.homer.apartInfo.dto.ApartInfoDto;
-import com.ssafy.homer.apartInfo.dto.MapLocationDto;
-import com.ssafy.homer.apartInfo.dto.SearchMapDto;
 import com.ssafy.homer.apartInfo.service.ApartInfoService;
 
 import lombok.RequiredArgsConstructor;
@@ -61,5 +58,9 @@ public class ApartInfoController {
 		return ResponseEntity.ok().body(location);
 	}
 	
-	
+	@GetMapping("/rankings")
+	public ResponseEntity getTopRanks(){
+		List<RankingDto> ranking = apartInfoService.getTopRanks();
+		return ResponseEntity.ok().body(ranking);
+	}
 }
