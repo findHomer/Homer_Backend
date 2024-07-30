@@ -84,6 +84,9 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 		ApartInfoDetailDto apartInfoDetailDto = buildApartInfoDetailDto(apartInfo, apartDealAreaDtoList);
 
 		rankingRedisService.addOrUpdateId(ranking,apartInfo.getAptId());
+
+		rankingRedisService.addOrUpdateIdByUnit(ranking,apartInfo.getAptId());
+
 		return apartInfoDetailDto;
 	}
 
