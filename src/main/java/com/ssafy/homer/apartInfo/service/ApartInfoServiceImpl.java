@@ -33,7 +33,6 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 	private final ApplicationContext context;
 	private final RankingRedisService rankingRedisService;
 
-	private final String ranking ="rank";
 
 	@Override
 	public List<ApartInfoDto> findTotalApart() {
@@ -83,9 +82,9 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 
 		ApartInfoDetailDto apartInfoDetailDto = buildApartInfoDetailDto(apartInfo, apartDealAreaDtoList);
 
-		rankingRedisService.addOrUpdateId(ranking,apartInfo.getAptId());
+		rankingRedisService.addOrUpdateId(apartInfo.getAptId());
 
-		rankingRedisService.addOrUpdateIdByUnit(ranking,apartInfo.getAptId());
+		rankingRedisService.addOrUpdateIdByUnit(apartInfo.getAptId());
 
 		return apartInfoDetailDto;
 	}
@@ -124,7 +123,7 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 
 	@Override
 	public List<RankingDto> getTopRanks() {
-		return rankingRedisService.getTopRanks(ranking, 5);
+		return rankingRedisService.getTopRanks( 5);
 	}
 
 	public Map<Float, ArrayList<ApartDealDto>> divideDataByArea(ApartInfo apartInfo) {
