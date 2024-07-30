@@ -66,6 +66,7 @@ public class SecurityConfig{
 				.and()
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
+                        .antMatchers("/api/v1/users/signup","/api/v1/users/ping","/api/v1/apartments/*").permitAll()
                         .antMatchers("/api/v1/users/**","/api/v1/bookmarks/**", "/api/v1/chat/**").hasAnyRole("USER", "ADMIN")
                         .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()

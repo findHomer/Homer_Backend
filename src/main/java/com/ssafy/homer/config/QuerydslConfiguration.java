@@ -1,4 +1,4 @@
-package com.ssafy.homer.apartInfo.config;
+package com.ssafy.homer.config;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

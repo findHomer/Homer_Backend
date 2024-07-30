@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '2.7.17'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
     id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10' // QueryDSL 플러그인
+    id "org.sonarqube" version "4.0.0.2929" //SonarQube
 }
 
 group = 'com.ssafy'
@@ -62,6 +63,11 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.0'
 	// https://mvnrepository.com/artifact/it.ozimov/embedded-redis
 	implementation 'it.ozimov:embedded-redis:0.7.2'
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+
 
 }
 
