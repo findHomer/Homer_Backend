@@ -3,7 +3,6 @@ package com.ssafy.homer.apartInfo.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * 아파트 전체정보 id,아파트명,위도경도 을 보내주는 DTO
@@ -11,7 +10,6 @@ import lombok.Setter;
  *
  */
 @Getter
-@Setter
 @AllArgsConstructor
 @Builder
 public class ApartInfoDto {

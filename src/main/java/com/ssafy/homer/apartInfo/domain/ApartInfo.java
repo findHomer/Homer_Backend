@@ -14,9 +14,8 @@ import lombok.Setter;
 
 @Entity(name="apart_info")
 @Getter
-@Setter
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 @Builder
 public class ApartInfo{
 	/*
@@ -56,12 +55,7 @@ public class ApartInfo{
 	//동코드
 	@Column(columnDefinition = "char")
 	private String entireCode;
-	
-	//아파트 거래 와 1:N
-	@OneToMany(mappedBy = "apartInfo")
-	private List<ApartDeal> apartDealList;
-	//리뷰와 1:N
-	
+
 	//즐겨찾기와  1:N
 	@OneToMany(mappedBy ="apartInfo")
 	private List<Bookmark> bookmarkList;

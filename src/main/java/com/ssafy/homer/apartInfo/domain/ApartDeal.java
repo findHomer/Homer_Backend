@@ -11,9 +11,8 @@ import java.util.Date;
 
 @Entity(name="apart_deal")
 @Getter
-@Setter
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 @Builder
 public class ApartDeal {
 

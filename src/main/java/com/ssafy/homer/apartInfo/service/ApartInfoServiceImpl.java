@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.ssafy.homer.apartInfo.domain.ApartDeal;
 import com.ssafy.homer.apartInfo.domain.ApartInfo;
 import com.ssafy.homer.apartInfo.dto.*;
+import com.ssafy.homer.apartInfo.repository.ApartDealRepository;
 import com.ssafy.homer.apartInfo.util.CustomSynchronizedArrayList;
 import com.ssafy.homer.apartInfo.util.MonthlyData;
 import com.ssafy.homer.exception.BaseException;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApartInfoServiceImpl implements ApartInfoService {
 
 	private final ApartInfoRepository apartInfoRepository;
+	private final ApartDealRepository apartDealRepository;
 	private final ApplicationContext context;
 	private final RankingRedisService rankingRedisService;
 
@@ -54,9 +56,9 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 	@Transactional(readOnly = true)
 	public ApartInfoDetailDto findApartDetail(String apartId) {
 		ApartInfo apartInfo = apartInfoRepository.findById(apartId).orElseThrow(() -> new BaseException(ErrorCode.APART_NOT_FOUND));
-
+		List<ApartDeal> apartDealList = apartDealRepository.findByApartInfo_AptId(apartId).orElseThrow(()-> new BaseException(ErrorCode.APART_NOT_FOUND));
 		//전용면적 기준 데이터 정리
-		Map<Float, ArrayList<ApartDealDto>> apartTransactionInfo = divideDataByArea(apartInfo);
+		Map<Float, ArrayList<ApartDealDto>> apartTransactionInfo = divideDataByArea(apartDealList);
 
 		//전용면적별 아파트 거래내역 및 평균 계산
 		List<ApartDealAreaDto> apartDealAreaDtoList = new CustomSynchronizedArrayList<>();
@@ -93,6 +95,7 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 	@Async("taskExecutor")
 	public CompletableFuture<Void> aSyncCalcApartDealList(Map.Entry<Float, ArrayList<ApartDealDto>> e, List<ApartDealAreaDto> apartDealAreaDtoList) throws InterruptedException {
 		LocalDate threeYearsAgo = LocalDate.now().minusYears(3);
+		log.info("thread start");
 		Map<String, MonthlyData> monthlyDataMap = new HashMap<>();
 		for (ApartDealDto deal : e.getValue()) {
 			LocalDate transactionDate = deal.getTransactionDate();
@@ -117,7 +120,7 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 			startDate = startDate.plusMonths(1);
 		}
 		apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(), e.getValue(), averageMonthDtoList));
-
+		log.info("thread end");
 		return CompletableFuture.completedFuture(null);
 	}
 
@@ -126,11 +129,11 @@ public class ApartInfoServiceImpl implements ApartInfoService {
 		return rankingRedisService.getTopRanks( 5);
 	}
 
-	public Map<Float, ArrayList<ApartDealDto>> divideDataByArea(ApartInfo apartInfo) {
+	public Map<Float, ArrayList<ApartDealDto>> divideDataByArea(List<ApartDeal> apartDealList) {
 
 		Map<Float, ArrayList<ApartDealDto>> map = new HashMap<>();
 
-		for (ApartDeal deal : apartInfo.getApartDealList()) {
+		for (ApartDeal deal : apartDealList) {
 			ArrayList<ApartDealDto> arr = map.getOrDefault(deal.getExclusiveArea(), new ArrayList<ApartDealDto>());
 
 			arr.add(ApartDealDto.builder()
