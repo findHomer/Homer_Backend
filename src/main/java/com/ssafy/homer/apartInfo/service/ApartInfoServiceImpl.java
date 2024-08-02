@@ -2,13 +2,17 @@ package com.ssafy.homer.apartInfo.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import com.ssafy.homer.apartInfo.domain.ApartDeal;
 import com.ssafy.homer.apartInfo.domain.ApartInfo;
 import com.ssafy.homer.apartInfo.dto.*;
+import com.ssafy.homer.apartInfo.repository.ApartDealRepository;
 import com.ssafy.homer.apartInfo.util.CustomSynchronizedArrayList;
 import com.ssafy.homer.apartInfo.util.MonthlyData;
 import com.ssafy.homer.exception.BaseException;
@@ -26,153 +30,158 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class ApartInfoServiceImpl implements ApartInfoService {
 
-	private final ApartInfoRepository apartInfoRepository;
-	private final ApplicationContext context;
-	private final RankingRedisService rankingRedisService;
+    private final ApartInfoRepository apartInfoRepository;
+    private final ApartDealRepository apartDealRepository;
+    private final ApplicationContext context;
+    private final RankingRedisService rankingRedisService;
 
 
-	@Override
-	public List<ApartInfoDto> findTotalApart() {
-		return apartInfoRepository.findSimpleAll();
-	}
+    @Override
+    public List<ApartInfoDto> findTotalApart() {
+        return apartInfoRepository.findSimpleAll();
+    }
 
-	@Override
-	public List<ApartInfoDto> findApartInMap(SearchMapDto searchMapDto) {
+    @Override
+    public List<ApartInfoDto> findApartInMap(SearchMapDto searchMapDto) {
 
-		return apartInfoRepository.searchMap(searchMapDto);
-	}
+        return apartInfoRepository.searchMap(searchMapDto);
+    }
 
-	@Override
-	public List<ApartInfoDto> findApartByName(SearchNameDto searchNameDto) {
-		return apartInfoRepository.searchName(searchNameDto);
-	}
+    @Override
+    public List<ApartInfoDto> findApartByName(SearchNameDto searchNameDto) {
+        return apartInfoRepository.searchName(searchNameDto);
+    }
 
-	@Override
-	@Transactional(readOnly = true)
-	public ApartInfoDetailDto findApartDetail(String apartId) {
-		ApartInfo apartInfo = apartInfoRepository.findById(apartId).orElseThrow(() -> new BaseException(ErrorCode.APART_NOT_FOUND));
+    @Override
+    @Transactional(readOnly = true)
+    public ApartInfoDetailDto findApartDetail(String apartId) {
 
-		//전용면적 기준 데이터 정리
-		Map<Float, ArrayList<ApartDealDto>> apartTransactionInfo = divideDataByArea(apartInfo);
+        ApartInfo apartInfo = apartInfoRepository.findById(apartId).orElseThrow(() -> new BaseException(ErrorCode.APART_NOT_FOUND));
 
-		//전용면적별 아파트 거래내역 및 평균 계산
-		List<ApartDealAreaDto> apartDealAreaDtoList = new CustomSynchronizedArrayList<>();
+        LocalDate threeYearsAgo = LocalDate.now().minusYears(3);
 
-		ApartInfoService proxy = context.getBean(ApartInfoService.class);
+        List<ApartDeal> apartDealList = apartDealRepository.findRecentDealsByAptId(apartId, threeYearsAgo).orElseThrow(() -> new BaseException(ErrorCode.APART_NOT_FOUND));
+        //전용면적 기준 데이터 정리
+        Map<Float, ArrayList<ApartDealDto>> apartTransactionInfo = divideDataByArea(apartDealList);
+
+        //전용면적별 아파트 거래내역 및 평균 계산
+        List<ApartDealAreaDto> apartDealAreaDtoList = new CustomSynchronizedArrayList<>();
+
+        ApartInfoService proxy = context.getBean(ApartInfoService.class);
+
+        // 비동기 작업 리스트
+        List<CompletableFuture<Void>> futures = apartTransactionInfo.entrySet().stream()
+                .map(entry -> {
+                    try {
+                        return proxy.aSyncCalcApartDealList(entry, apartDealAreaDtoList);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        allOf.join();  // 모든 작업이 완료될 때까지 기다림
+
+        apartDealAreaDtoList.sort((o1, o2) -> (int) (o1.getExclusiveArea() - o2.getExclusiveArea()));
+
+        ApartInfoDetailDto apartInfoDetailDto = buildApartInfoDetailDto(apartInfo, apartDealAreaDtoList);
+
+        rankingRedisService.addOrUpdateId(apartInfo.getAptId());
+
+        rankingRedisService.addOrUpdateIdByUnit(apartInfo.getAptId());
+
+        return apartInfoDetailDto;
+    }
 
 
-		// 비동기 작업 리스트
-		List<CompletableFuture<Void>> futures = apartTransactionInfo.entrySet().stream()
-				.map(entry -> {
-					try {
-						return proxy.aSyncCalcApartDealList(entry, apartDealAreaDtoList);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					}
-				})
-				.collect(Collectors.toList());
+    @Async("taskExecutor")
+    public CompletableFuture<Void> aSyncCalcApartDealList(Map.Entry<Float, ArrayList<ApartDealDto>> e, List<ApartDealAreaDto> apartDealAreaDtoList) throws InterruptedException {
+        LocalDate threeYearsAgo = LocalDate.now().minusYears(3);
+        //log.info("thread start");
+        Map<String, MonthlyData> monthlyDataMap = new HashMap<>();
+        for (ApartDealDto deal : e.getValue()) {
+            LocalDate transactionDate = deal.getTransactionDate();
 
-		CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-		allOf.join();  // 모든 작업이 완료될 때까지 기다림
+            // 최근 3년 데이터만 처리
+            if (transactionDate.isAfter(threeYearsAgo)) {
+                String monthYearKey = transactionDate.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+                MonthlyData monthlyData = monthlyDataMap.getOrDefault(monthYearKey, new MonthlyData(0, 0));
 
-		apartDealAreaDtoList.sort((o1, o2) -> (int) (o1.getExclusiveArea() - o2.getExclusiveArea()));
+                monthlyData.addDeal(Integer.parseInt(deal.getTransactionAmount().replace(",", "")));
+                monthlyDataMap.put(monthYearKey, monthlyData);
+            }
 
-		ApartInfoDetailDto apartInfoDetailDto = buildApartInfoDetailDto(apartInfo, apartDealAreaDtoList);
+        }
+        ArrayList<AverageMonthDto> averageMonthDtoList = new ArrayList<>();
+        LocalDate startDate = LocalDate.now().minusYears(3);
+        LocalDate endDate = LocalDate.now();
 
-		rankingRedisService.addOrUpdateId(apartInfo.getAptId());
+        while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
 
-		rankingRedisService.addOrUpdateIdByUnit(apartInfo.getAptId());
+            averageMonthDtoList.add(new AverageMonthDto(startDate.format(DateTimeFormatter.ofPattern("yy.MM")), monthlyDataMap.getOrDefault(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")), new MonthlyData(0, 0)).getAverage()));
+            startDate = startDate.plusMonths(1);
+        }
+        apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(), e.getValue(), averageMonthDtoList));
+        //log.info("thread end");
+        return CompletableFuture.completedFuture(null);
+    }
 
-		return apartInfoDetailDto;
-	}
+    @Override
+    public List<RankingDto> getTopRanks() {
+        return rankingRedisService.getTopRanks(5);
+    }
 
+    public Map<Float, ArrayList<ApartDealDto>> divideDataByArea(List<ApartDeal> apartDealList) {
 
-	@Async("taskExecutor")
-	public CompletableFuture<Void> aSyncCalcApartDealList(Map.Entry<Float, ArrayList<ApartDealDto>> e, List<ApartDealAreaDto> apartDealAreaDtoList) throws InterruptedException {
-		LocalDate threeYearsAgo = LocalDate.now().minusYears(3);
-		Map<String, MonthlyData> monthlyDataMap = new HashMap<>();
-		for (ApartDealDto deal : e.getValue()) {
-			LocalDate transactionDate = deal.getTransactionDate();
+        Map<Float, ArrayList<ApartDealDto>> map = new HashMap<>();
 
-			// 최근 3년 데이터만 처리
-			if (transactionDate.isAfter(threeYearsAgo)) {
-				String monthYearKey = transactionDate.format(DateTimeFormatter.ofPattern("yyyy-MM"));
-				MonthlyData monthlyData = monthlyDataMap.getOrDefault(monthYearKey, new MonthlyData(0, 0));
+        for (ApartDeal deal : apartDealList) {
+            ArrayList<ApartDealDto> arr = map.getOrDefault(deal.getExclusiveArea(), new ArrayList<ApartDealDto>());
 
-				monthlyData.addDeal(Integer.parseInt(deal.getTransactionAmount().replace(",", "")));
-				monthlyDataMap.put(monthYearKey, monthlyData);
-			}
+            arr.add(ApartDealDto.builder()
+                    .dealId(deal.getDealId())
+                    .floor(deal.getFloor())
+                    .transactionAmount(deal.getTransactionAmount().trim())
+                    .transactionDate(deal.getTransactionDate())
+                    .build());
 
-		}
-		ArrayList<AverageMonthDto> averageMonthDtoList = new ArrayList<>();
-		LocalDate startDate = LocalDate.now().minusYears(3);
-		LocalDate endDate = LocalDate.now();
+            map.put(deal.getExclusiveArea(), arr);
+        }
 
-		while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
+        return map;
+    }
 
-			averageMonthDtoList.add(new AverageMonthDto(startDate.format(DateTimeFormatter.ofPattern("yy.MM")), monthlyDataMap.getOrDefault(startDate.format(DateTimeFormatter.ofPattern("yyyy-MM")), new MonthlyData(0, 0)).getAverage()));
-			startDate = startDate.plusMonths(1);
-		}
-		apartDealAreaDtoList.add(new ApartDealAreaDto(e.getKey(), e.getValue(), averageMonthDtoList));
+    @Override
+    public MapLocationDto findDongLocation(String entireCode) {
+        ApartInfo apart = apartInfoRepository.findFirstByEntireCodeStartingWith(entireCode).orElse(
+                apartInfoRepository.findFirstByEntireCodeStartingWith(entireCode.substring(0, entireCode.length() - 4)).orElseThrow(null));
 
-		return CompletableFuture.completedFuture(null);
-	}
+        return MapLocationDto.builder()
+                .lat(apart.getLat())
+                .lng(apart.getLng())
+                .build();
+    }
 
-	@Override
-	public List<RankingDto> getTopRanks() {
-		return rankingRedisService.getTopRanks( 5);
-	}
-
-	public Map<Float, ArrayList<ApartDealDto>> divideDataByArea(ApartInfo apartInfo) {
-
-		Map<Float, ArrayList<ApartDealDto>> map = new HashMap<>();
-
-		for (ApartDeal deal : apartInfo.getApartDealList()) {
-			ArrayList<ApartDealDto> arr = map.getOrDefault(deal.getExclusiveArea(), new ArrayList<ApartDealDto>());
-
-			arr.add(ApartDealDto.builder()
-					.dealId(deal.getDealId())
-					.floor(deal.getFloor())
-					.transactionAmount(deal.getTransactionAmount().trim())
-					.transactionDate(deal.getTransactionDate())
-					.build());
-
-			map.put(deal.getExclusiveArea(), arr);
-		}
-
-		return map;
-	}
-
-	@Override
-	public MapLocationDto findDongLocation(String entireCode) {
-		ApartInfo apart = apartInfoRepository.findFirstByEntireCodeStartingWith(entireCode).orElse(
-				apartInfoRepository.findFirstByEntireCodeStartingWith(entireCode.substring(0, entireCode.length() - 4)).orElseThrow(null));
-		return MapLocationDto.builder()
-				.lat(apart.getLat())
-				.lng(apart.getLng())
-				.build();
-	}
-
-	private ApartInfoDetailDto buildApartInfoDetailDto(ApartInfo apartInfo, List<ApartDealAreaDto> apartDealAreaDtoList) {
-		return ApartInfoDetailDto.builder()
-				.aptId(apartInfo.getAptId())
-				.aisleType(apartInfo.getAisleType())
-				.allowDate(apartInfo.getAllowDate())
-				.aptName(apartInfo.getAptName())
-				.parkPerHouse(apartInfo.getParkPerHouse())
-				.lawAddr(apartInfo.getLawAddr())
-				.roadAddr(apartInfo.getRoadAddr())
-				.emails(new ArrayList<>())
-				.dongCount(apartInfo.getDongCount())
-				.maxFloor(apartInfo.getMaxFloor())
-				.lat(apartInfo.getLat())
-				.lng(apartInfo.getLng())
-				.householdCount(apartInfo.getHouseholdCount())
-				.dealInfos(apartDealAreaDtoList)
-				.build();
-	}
+    private ApartInfoDetailDto buildApartInfoDetailDto(ApartInfo apartInfo, List<ApartDealAreaDto> apartDealAreaDtoList) {
+        return ApartInfoDetailDto.builder()
+                .aptId(apartInfo.getAptId())
+                .aisleType(apartInfo.getAisleType())
+                .allowDate(apartInfo.getAllowDate())
+                .aptName(apartInfo.getAptName())
+                .parkPerHouse(apartInfo.getParkPerHouse())
+                .lawAddr(apartInfo.getLawAddr())
+                .roadAddr(apartInfo.getRoadAddr())
+                .emails(new ArrayList<>())
+                .dongCount(apartInfo.getDongCount())
+                .maxFloor(apartInfo.getMaxFloor())
+                .lat(apartInfo.getLat())
+                .lng(apartInfo.getLng())
+                .householdCount(apartInfo.getHouseholdCount())
+                .dealInfos(apartDealAreaDtoList)
+                .build();
+    }
 }
 
